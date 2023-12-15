@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:impersonation_detector/Screens/instagram.dart';
 import 'package:impersonation_detector/Screens/twitter.dart';
 
 class HomePage extends StatelessWidget {
@@ -33,19 +34,19 @@ class HomePage extends StatelessWidget {
               width: MediaQuery.of(context).size.width * 0.5,
               child: ElevatedButton(
                 style: const ButtonStyle(
-                  backgroundColor: MaterialStatePropertyAll(Colors.blue),
+                  backgroundColor: MaterialStatePropertyAll(Colors.red),
                   elevation: MaterialStatePropertyAll(0),
                 ),
                 onPressed: () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: ((context) => const TwitterHome()),
+                      builder: ((context) => const InstaHome()),
                     ),
                   );
                 },
                 child: const Text(
-                  'Twitter',
+                  'Instagram',
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 16,

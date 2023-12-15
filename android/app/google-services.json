@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "467449712814",
+    "project_id": "impersonation-detector",
+    "storage_bucket": "impersonation-detector.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:467449712814:android:69807341ff8e272f401d3f",
+        "android_client_info": {
+          "package_name": "com.example.impersonation_detector"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAvOirMoSs5Pf03kmSrKBH8HVOzc9AItxM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -3,14 +3,14 @@ import 'package:image_picker/image_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:impersonation_detector/Theme/theme.dart';
 
-class TwitterHome extends StatefulWidget {
-  const TwitterHome({super.key});
+class InstaHome extends StatefulWidget {
+  const InstaHome({super.key});
 
   @override
-  State<TwitterHome> createState() => _TwitterHomeState();
+  State<InstaHome> createState() => _InstaHomeState();
 }
 
-class _TwitterHomeState extends State<TwitterHome> {
+class _InstaHomeState extends State<InstaHome> {
   String _name = "";
   File? _selectedImage;
 
@@ -18,7 +18,7 @@ class _TwitterHomeState extends State<TwitterHome> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Twitter',
+        title: const Text('Instagram',
             style: TextStyle(fontWeight: FontWeight.bold)),
         centerTitle: true,
       ),
@@ -67,6 +67,7 @@ class _TwitterHomeState extends State<TwitterHome> {
               child: Container(
                 margin: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(16),
                   border: Border.all(
                     width: 1.5,
                   ),
@@ -91,13 +92,13 @@ class _TwitterHomeState extends State<TwitterHome> {
               child: SizedBox(
                 height: 50,
                 width: MediaQuery.of(context).size.width * 0.5,
-                child: OutlinedButton(
+                child: ElevatedButton(
                   style: const ButtonStyle(
                       shape: MaterialStatePropertyAll(
                         RoundedRectangleBorder(
                           borderRadius: BorderRadius.all(
                             Radius.circular(
-                              16,
+                              50,
                             ),
                           ),
                         ),
