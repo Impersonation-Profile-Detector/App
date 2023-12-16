@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:impersonation_detector/Screens/homepage.dart';
 import 'package:impersonation_detector/Theme/theme.dart';
 import 'firebase_options.dart';
+import 'package:impersonation_detector/Screens/insta_results.dart';
 
 void main() async {
   runApp(const MyApp());
@@ -21,7 +22,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       theme: theme1,
       debugShowCheckedModeBanner: false,
-      home: const HomePage(),
+      home: const InstaResultsPage(username: 'elon',),
     );
   }
 }
