@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:impersonation_detector/Screens/insta_results.dart';
+import 'package:impersonation_detector/Screens/instagram.dart';
+import 'package:impersonation_detector/Widgets/display_container.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -30,12 +32,26 @@ class HomePage extends StatelessWidget {
             const SizedBox(
               height: 25,
             ),
-            TextField(
-              controller: usernameController,
-              decoration: InputDecoration(labelText: 'Enter username'),
+            SizedBox(
+              height: 50,
+              width: MediaQuery.of(context).size.width * 0.5,
+              child: ElevatedButton(
+                style: ButtonStyle(
+                  backgroundColor: MaterialStateProperty.all(Colors.blue),
+                  elevation: MaterialStateProperty.all(0),
+                ),
+                onPressed: () {},
+                child: const Text(
+                  'Twitter',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                  ),
+                ),
+              ),
             ),
             const SizedBox(
-              height: 20,
+              height: 25,
             ),
             SizedBox(
               height: 50,
@@ -49,7 +65,7 @@ class HomePage extends StatelessWidget {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => InstaResultsPage(username: usernameController.text),
+                      builder: (context) => const InstaHome(),
                     ),
                   );
                 },
@@ -61,7 +77,10 @@ class HomePage extends StatelessWidget {
                   ),
                 ),
               ),
-            )
+            ),
+            const SizedBox(
+              height: 20,
+            ),
           ]),
         ),
       ),

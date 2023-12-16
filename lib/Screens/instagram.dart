@@ -3,6 +3,7 @@
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:impersonation_detector/Screens/insta_results.dart';
 import 'package:impersonation_detector/Theme/theme.dart';
 
 class InstaHome extends StatefulWidget {
@@ -15,6 +16,15 @@ class InstaHome extends StatefulWidget {
 class _InstaHomeState extends State<InstaHome> {
   String _name = "";
   File? _selectedImage;
+
+  final _controller = TextEditingController();
+  bool _validate = false;
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +41,7 @@ class _InstaHomeState extends State<InstaHome> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(
-              height: 50,
+              height: 40,
             ),
             const Text(
               'Enter Your Name',
@@ -45,13 +55,18 @@ class _InstaHomeState extends State<InstaHome> {
             SizedBox(
               width: MediaQuery.of(context).size.width * 0.75,
               child: TextField(
+                controller: _controller,
+                decoration: InputDecoration(
+                  labelText: 'Enter the Value',
+                  errorText: _validate ? "Value Can't Be Empty" : null,
+                ),
                 onChanged: (value) {
                   _name = value;
                 },
               ),
             ),
             const SizedBox(
-              height: 75,
+              height: 50,
             ),
             const Text(
               'Upload Your Image',
@@ -80,7 +95,7 @@ class _InstaHomeState extends State<InstaHome> {
                 child: _selectedImage != null
                     ? Image.file(_selectedImage!, fit: BoxFit.cover)
                     : const Text(
-                        "Please Select an Image",
+                        "Tap here to upload an image",
                         style: TextStyle(
                           fontSize: 15,
                         ),
@@ -93,14 +108,14 @@ class _InstaHomeState extends State<InstaHome> {
             Center(
               child: SizedBox(
                 height: 50,
-                width: MediaQuery.of(context).size.width * 0.5,
+                width: MediaQuery.of(context).size.width * 0.7,
                 child: ElevatedButton(
                   style: const ButtonStyle(
                       shape: MaterialStatePropertyAll(
                         RoundedRectangleBorder(
                           borderRadius: BorderRadius.all(
                             Radius.circular(
-                              50,
+                              12,
                             ),
                           ),
                         ),
@@ -108,7 +123,20 @@ class _InstaHomeState extends State<InstaHome> {
                       elevation: MaterialStatePropertyAll(0),
                       backgroundColor: MaterialStatePropertyAll(
                           Color.fromARGB(255, 91, 200, 251))),
-                  onPressed: () {},
+                  onPressed: () {
+                    setState(() {
+                      _validate = _controller.text.isEmpty;
+                    });
+                    if(!_validate){
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              InstaResultsPage(username: _name),
+                        ),
+                      );
+                    }
+                  },
                   child: const Text(
                     'Proceed',
                     style: TextStyle(

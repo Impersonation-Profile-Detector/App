@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:impersonation_detector/Theme/theme.dart';
 
 class TwitterHome extends StatefulWidget {
   const TwitterHome({super.key});

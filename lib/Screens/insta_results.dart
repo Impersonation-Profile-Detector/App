@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:impersonation_detector/Widgets/display_container.dart';
 
 class InstaResultsPage extends StatefulWidget {
   final String username;
@@ -22,7 +23,8 @@ class _InstaResultsPageState extends State<InstaResultsPage> {
 
   Future<void> fetchData() async {
     // API endpoint and headers
-    final url = 'https://rocketapi-for-instagram.p.rapidapi.com/instagram/search';
+    const url =
+        'https://rocketapi-for-instagram.p.rapidapi.com/instagram/search';
     final headers = {
       'content-type': 'application/json',
       'X-RapidAPI-Key': '8db0e54e94msh98b37a582a2adefp182a93jsnf53067009cea',
@@ -76,23 +78,27 @@ class _InstaResultsPageState extends State<InstaResultsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Instagram Results'),
+        title: const Text('Instagram Results'),
       ),
       body: jsonData.isEmpty
-          ? Center(child: Text('No results'))
+          ? const Center(child: Text('No results'))
           : ListView.builder(
               itemCount: jsonData.length,
               itemBuilder: (context, index) {
                 final user = jsonData[index]['user'];
 
-                return ListTile(
-                  title: Text(user['full_name'] ?? 'N/A'),
-                  subtitle: Image.network(
-                    user['profile_pic_url'] ?? '',
-                    height: 50,
-                    width: 50,
-                  ),
+                return DisplayContainer(
+                  user: user,
                 );
+
+                // ListTile(
+                //   title: Text(user['full_name'] ?? 'N/A'),
+                //   subtitle: Image.network(
+                //     user['profile_pic_url'] ?? '',
+                //     height: 50,
+                //     width: 50,
+                //   ),
+                // );
               },
             ),
     );
