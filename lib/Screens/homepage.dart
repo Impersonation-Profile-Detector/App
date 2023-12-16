@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:impersonation_detector/Screens/instagram.dart';
-import 'package:impersonation_detector/Screens/twitter.dart';
+import 'package:impersonation_detector/Screens/insta_results.dart';
 
 class HomePage extends StatelessWidget {
-  const HomePage({super.key});
+  const HomePage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    TextEditingController usernameController = TextEditingController();
+
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -29,19 +30,26 @@ class HomePage extends StatelessWidget {
             const SizedBox(
               height: 25,
             ),
+            TextField(
+              controller: usernameController,
+              decoration: InputDecoration(labelText: 'Enter username'),
+            ),
+            const SizedBox(
+              height: 20,
+            ),
             SizedBox(
               height: 50,
               width: MediaQuery.of(context).size.width * 0.5,
               child: ElevatedButton(
-                style: const ButtonStyle(
-                  backgroundColor: MaterialStatePropertyAll(Colors.red),
-                  elevation: MaterialStatePropertyAll(0),
+                style: ButtonStyle(
+                  backgroundColor: MaterialStateProperty.all(Colors.red),
+                  elevation: MaterialStateProperty.all(0),
                 ),
                 onPressed: () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: ((context) => const InstaHome()),
+                      builder: (context) => InstaResultsPage(username: usernameController.text),
                     ),
                   );
                 },
