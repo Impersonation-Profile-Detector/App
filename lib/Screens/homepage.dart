@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:impersonation_detector/Screens/insta_results.dart';
-import 'package:impersonation_detector/Screens/instagram.dart';
-import 'package:impersonation_detector/Widgets/display_container.dart';
+import 'package:impersonation_detector/screens/insta_results.dart';
+import 'package:impersonation_detector/screens/instagram.dart';
+import 'package:impersonation_detector/widgets/display_container.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({Key? key}) : super(key: key);

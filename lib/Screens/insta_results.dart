@@ -1,18 +1,20 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:impersonation_detector/Widgets/display_container.dart';
+import 'package:impersonation_detector/widgets/display_container.dart';
 
 class InstaResultsPage extends StatefulWidget {
   final String username;
-
-  const InstaResultsPage({Key? key, required this.username}) : super(key: key);
+  final String imgUrl;
+  const InstaResultsPage(
+      {Key? key, required this.username, required this.imgUrl})
+      : super(key: key);
 
   @override
-  _InstaResultsPageState createState() => _InstaResultsPageState();
+  InstaResultsPageState createState() => InstaResultsPageState();
 }
 
-class _InstaResultsPageState extends State<InstaResultsPage> {
+class InstaResultsPageState extends State<InstaResultsPage> {
   List<dynamic> jsonData = [];
 
   @override
@@ -45,7 +47,7 @@ class _InstaResultsPageState extends State<InstaResultsPage> {
       if (response.statusCode == 200) {
         // Decode the JSON response
         final dynamic responseData = jsonDecode(response.body);
-        print('Full JSON Response: $responseData');
+        // print('Full JSON Response: $responseData');
 
         // Check and extract information from the response
         if (responseData is Map && responseData.containsKey('response')) {
@@ -67,10 +69,10 @@ class _InstaResultsPageState extends State<InstaResultsPage> {
           }
         }
       } else {
-        print('Request failed with status: ${response.statusCode}');
+        // print('Request failed with status: ${response.statusCode}');
       }
     } catch (error) {
-      print('Error: $error');
+      // print('Error: $error');
     }
   }
 
@@ -81,7 +83,9 @@ class _InstaResultsPageState extends State<InstaResultsPage> {
         title: const Text('Instagram Results'),
       ),
       body: jsonData.isEmpty
-          ? const Center(child: Text('No results'))
+          ? const Center(
+              child: SizedBox(
+                  height: 125, width: 125, child: CircularProgressIndicator()))
           : ListView.builder(
               itemCount: jsonData.length,
               itemBuilder: (context, index) {
@@ -89,16 +93,9 @@ class _InstaResultsPageState extends State<InstaResultsPage> {
 
                 return DisplayContainer(
                   user: user,
+                  name: widget.username,
+                  imgUrl: widget.imgUrl,
                 );
-
-                // ListTile(
-                //   title: Text(user['full_name'] ?? 'N/A'),
-                //   subtitle: Image.network(
-                //     user['profile_pic_url'] ?? '',
-                //     height: 50,
-                //     width: 50,
-                //   ),
-                // );
               },
             ),
     );
