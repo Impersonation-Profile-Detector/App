@@ -3,18 +3,17 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:impersonation_detector/widgets/display_container.dart';
 
-class InstaResultsPage extends StatefulWidget {
+class XResultsPage extends StatefulWidget {
   final String username;
-  final String imgUrl;
-  const InstaResultsPage(
-      {Key? key, required this.username, required this.imgUrl})
+  const XResultsPage(
+      {Key? key, required this.username})
       : super(key: key);
 
   @override
-  InstaResultsPageState createState() => InstaResultsPageState();
+  XResultsPageState createState() => XResultsPageState();
 }
 
-class InstaResultsPageState extends State<InstaResultsPage> {
+class XResultsPageState extends State<XResultsPage> {
   List<dynamic> jsonData = [];
 
   @override
@@ -26,15 +25,15 @@ class InstaResultsPageState extends State<InstaResultsPage> {
   Future<void> fetchData() async {
     // API endpoint and headers
     const url =
-        'https://rocketapi-for-instagram.p.rapidapi.com/instagram/search';
+        'https://twitter135.p.rapidapi.com/AutoComplete/';
     final headers = {
       'content-type': 'application/json',
-      'X-RapidAPI-Key': '8db0e54e94msh98b37a582a2adefp182a93jsnf53067009cea',
-      'X-RapidAPI-Host': 'rocketapi-for-instagram.p.rapidapi.com',
+      'X-RapidAPI-Key': 'e33db81bf2msh8b2a2c7b8cf5363p1c7fbbjsn2617a896ce97',
+      'X-RapidAPI-Host': 'twitter135.p.rapidapi.com',
     };
 
     // Request body with the username to search
-    final body = {'query': widget.username};
+    final body = {'q': widget.username};
 
     try {
       // Perform the HTTP POST request
@@ -47,7 +46,7 @@ class InstaResultsPageState extends State<InstaResultsPage> {
       if (response.statusCode == 200) {
         // Decode the JSON response
         final dynamic responseData = jsonDecode(response.body);
-        // print('Full JSON Response: $responseData');
+        print('Full JSON Response: $responseData');
 
         // Check and extract information from the response
         if (responseData is Map && responseData.containsKey('response')) {
@@ -105,11 +104,19 @@ class InstaResultsPageState extends State<InstaResultsPage> {
               itemBuilder: (context, index) {
                 final user = jsonData[index]['user'];
 
-                return DisplayContainer(
-                  user: user,
-                  name: widget.username,
-                  imgUrl: widget.imgUrl,
+                return ListTile(
+                  title: Text(user['name'] ?? 'N/A'),
+                  subtitle: Image.network(
+                    user['profile_image_url'] ?? '',
+                    height: 50,
+                    width: 50,
+                  ),
                 );
+                // DisplayContainer(
+                //   user: user,
+                //   name: widget.username,
+                //   imgUrl: widget.imgUrl,
+                // );
               },
             ),
     );

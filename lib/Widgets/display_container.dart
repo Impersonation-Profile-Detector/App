@@ -19,7 +19,7 @@ class _DisplayContainerState extends State<DisplayContainer> {
     required String requesturl,
   }) async {
     final requestDetails =
-        FirebaseFirestore.instance.collection('Match_Request').doc();
+        FirebaseFirestore.instance.collection('Insta_request').doc();
     final json = {
       'Name': name,
       'User_Image': imgurl,
