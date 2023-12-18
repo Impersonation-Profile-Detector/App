@@ -1,5 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:uuid/uuid.dart';
+
+var uuid = const Uuid();
 
 class DisplayContainer extends StatefulWidget {
   final dynamic user;
@@ -13,13 +18,15 @@ class DisplayContainer extends StatefulWidget {
 }
 
 class _DisplayContainerState extends State<DisplayContainer> {
+  String docID = uuid.v1();
+
   Future uploadDetails({
     required String name,
     required String imgurl,
     required String requesturl,
   }) async {
     final requestDetails =
-        FirebaseFirestore.instance.collection('Insta_request').doc();
+        FirebaseFirestore.instance.collection('Insta_request').doc(docID);
     final json = {
       'Name': name,
       'User_Image': imgurl,
@@ -78,22 +85,59 @@ class _DisplayContainerState extends State<DisplayContainer> {
                     height: 70,
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: Text(
-                    widget.user['full_name'] ?? 'N/A',
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w400,
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                      child: Text(
+                        widget.user['full_name'] ?? 'N/A',
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
                     ),
-                  ),
+                    StreamBuilder(
+                      stream: FirebaseFirestore.instance
+                          .collection('Insta_request')
+                          .doc(docID)
+                          .snapshots(),
+                      builder: (context, snapshot) {
+                        if (!snapshot.hasData) {
+                          return const SizedBox(
+                              height: 25,
+                              width: 25,
+                              child: CircularProgressIndicator(
+                                color: Colors.blue,
+                              ));
+                        }
+                        try {
+                          var userDocument = snapshot.data;
+                          bool result = userDocument!["Status"];
+                          if (result == true) {
+                            return const Icon(
+                              Icons.verified_rounded,
+                              color: CupertinoColors.activeGreen,
+                            );
+                          } else {
+                            return const Icon(
+                              Icons.error_outline,
+                              color: CupertinoColors.systemRed,
+                            );
+                          }
+                        } catch (e) {
+                          return const SizedBox(
+                              height: 25,
+                              width: 25,
+                              child: CircularProgressIndicator(
+                                color: Colors.blue,
+                              ));
+                        }
+                      },
+                    )
+                  ],
                 ),
-                const SizedBox(
-                    height: 25,
-                    width: 25,
-                    child: CircularProgressIndicator(
-                      color: Colors.red,
-                    )),
               ],
             ),
           )),

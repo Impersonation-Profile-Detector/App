@@ -5,9 +5,7 @@ import 'package:impersonation_detector/widgets/display_container.dart';
 
 class XResultsPage extends StatefulWidget {
   final String username;
-  const XResultsPage(
-      {Key? key, required this.username})
-      : super(key: key);
+  const XResultsPage({Key? key, required this.username}) : super(key: key);
 
   @override
   XResultsPageState createState() => XResultsPageState();
@@ -24,8 +22,7 @@ class XResultsPageState extends State<XResultsPage> {
 
   Future<void> fetchData() async {
     // API endpoint and headers
-    const url =
-        'https://twitter135.p.rapidapi.com/AutoComplete/';
+    const url = 'https://twitter135.p.rapidapi.com/AutoComplete/';
     final headers = {
       'content-type': 'application/json',
       'X-RapidAPI-Key': 'e33db81bf2msh8b2a2c7b8cf5363p1c7fbbjsn2617a896ce97',
@@ -100,7 +97,8 @@ class XResultsPageState extends State<XResultsPage> {
               child: SizedBox(
                   height: 125, width: 125, child: CircularProgressIndicator()))
           : ListView.builder(
-              itemCount: jsonData.length,
+              //! length defined explicitly
+              itemCount: 10,
               itemBuilder: (context, index) {
                 final user = jsonData[index]['user'];
 
@@ -112,11 +110,6 @@ class XResultsPageState extends State<XResultsPage> {
                     width: 50,
                   ),
                 );
-                // DisplayContainer(
-                //   user: user,
-                //   name: widget.username,
-                //   imgUrl: widget.imgUrl,
-                // );
               },
             ),
     );
