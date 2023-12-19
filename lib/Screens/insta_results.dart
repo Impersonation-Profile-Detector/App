@@ -101,11 +101,12 @@ class InstaResultsPageState extends State<InstaResultsPage> {
               child: SizedBox(
                   height: 125, width: 125, child: CircularProgressIndicator()))
           : ListView.builder(
-              itemCount: jsonData.length,
+              physics: const BouncingScrollPhysics(),
+              //! length defined explicitly
+              itemCount: 6,
               itemBuilder: (context, index) {
                 final user = jsonData[index]['user'];
-
-                return DisplayContainer(
+                return DisplayContainerInsta(
                   user: user,
                   name: widget.username,
                   imgUrl: widget.imgUrl,

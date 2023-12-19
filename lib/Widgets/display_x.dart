@@ -5,18 +5,21 @@ import 'package:uuid/uuid.dart';
 
 var uuid = const Uuid();
 
-class DisplayContainerInsta extends StatefulWidget {
+class DisplayContainerX extends StatefulWidget {
   final dynamic user;
   final String name;
   final String imgUrl;
-  const DisplayContainerInsta(
-      {super.key, this.user, required this.name, required this.imgUrl});
+  const DisplayContainerX(
+      {super.key,
+      required this.user,
+      required this.name,
+      required this.imgUrl});
 
   @override
-  State<DisplayContainerInsta> createState() => _DisplayContainerInstaState();
+  State<DisplayContainerX> createState() => _DisplayContainerXState();
 }
 
-class _DisplayContainerInstaState extends State<DisplayContainerInsta> {
+class _DisplayContainerXState extends State<DisplayContainerX> {
   String docID = uuid.v1();
   String result = 'loading';
 
@@ -38,12 +41,11 @@ class _DisplayContainerInstaState extends State<DisplayContainerInsta> {
   }
 
   void submitRequest() async {
-    
     try {
       uploadDetails(
           name: widget.name,
           imgurl: widget.imgUrl,
-          requesturl: widget.user['profile_pic_url'],
+          requesturl: widget.user['profile_image_url'],
           status: 'loading');
     } catch (e) {
       ScaffoldMessenger.of(context).clearSnackBars();
@@ -94,7 +96,7 @@ class _DisplayContainerInstaState extends State<DisplayContainerInsta> {
                   clipBehavior: Clip.antiAlias,
                   borderRadius: BorderRadius.circular(12),
                   child: Image.network(
-                    widget.user['profile_pic_url'] ?? '',
+                    widget.user['profile_image_url'] ?? '',
                     height: 70,
                   ),
                 ),
@@ -107,7 +109,7 @@ class _DisplayContainerInstaState extends State<DisplayContainerInsta> {
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 8),
                       child: Text(
-                        widget.user['full_name'] ?? 'N/A',
+                        widget.user['screen_name'] ?? 'N/A',
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w400,

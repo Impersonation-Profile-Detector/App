@@ -20,7 +20,7 @@ class _HomePageState extends State<HomePage> {
   final _controller = TextEditingController();
   bool _validate = false;
 
-  void submitDetails() async {
+  void submitInstaDetails() async {
     showDialog(
       context: context,
       builder: (context) {
@@ -41,6 +41,42 @@ class _HomePageState extends State<HomePage> {
         MaterialPageRoute(
           builder: (context) =>
               InstaResultsPage(username: _name, imgUrl: imgUrl),
+        ),
+      );
+    } catch (e) {
+      Navigator.of(context).pop();
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).clearSnackBars();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            e.toString(),
+          ),
+        ),
+      );
+    }
+  }
+
+  void submitXDetails() async {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return const Center(child: CircularProgressIndicator());
+      },
+    );
+    try {
+      final storageRef = FirebaseStorage.instance
+          .ref()
+          .child('user_images')
+          .child('$_name.jpg');
+      await storageRef.putFile(_selectedImage!);
+      imgUrl = await storageRef.getDownloadURL();
+      if (!mounted) return;
+      Navigator.of(context).pop();
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => XResultsPage(username: _name, imgUrl: imgUrl),
         ),
       );
     } catch (e) {
@@ -169,13 +205,12 @@ class _HomePageState extends State<HomePage> {
                           elevation: MaterialStateProperty.all(0),
                         ),
                         onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  XResultsPage(username: _name),
-                            ),
-                          );
+                          setState(() {
+                            _validate = _controller.text.isEmpty;
+                          });
+                          if (!_validate) {
+                            submitXDetails();
+                          }
                         },
                         child: const Text(
                           'X',
@@ -200,7 +235,7 @@ class _HomePageState extends State<HomePage> {
                             _validate = _controller.text.isEmpty;
                           });
                           if (!_validate) {
-                            submitDetails();
+                            submitInstaDetails();
                           }
                         },
                         child: const Text(

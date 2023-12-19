@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:impersonation_detector/widgets/display_X.dart';
 import 'package:impersonation_detector/widgets/display_container.dart';
 
 class XResultsPage extends StatefulWidget {
+  final String imgUrl;
   final String username;
-  const XResultsPage({Key? key, required this.username}) : super(key: key);
+  const XResultsPage({Key? key, required this.username, required this.imgUrl})
+      : super(key: key);
 
   @override
   XResultsPageState createState() => XResultsPageState();
@@ -29,39 +32,29 @@ class XResultsPageState extends State<XResultsPage> {
       'X-RapidAPI-Host': 'twitter135.p.rapidapi.com',
     };
 
-    // Request body with the username to search
-    final body = {'q': widget.username};
+    String finalUrl = '$url?q=${widget.username}';
 
     try {
-      // Perform the HTTP POST request
-      final response = await http.post(
-        Uri.parse(url),
+      // Perform the HTTP GET request
+      final response = await http.get(
+        Uri.parse(finalUrl),
         headers: headers,
-        body: jsonEncode(body),
       );
 
       if (response.statusCode == 200) {
         // Decode the JSON response
         final dynamic responseData = jsonDecode(response.body);
-        print('Full JSON Response: $responseData');
+        // print('Full JSON Response: $responseData');
 
         // Check and extract information from the response
-        if (responseData is Map && responseData.containsKey('response')) {
-          final dynamic responseInfo = responseData['response'];
+        if (responseData is Map && responseData.containsKey('users')) {
+          final dynamic users = responseData['users'];
+          // Update the state with the list of users
 
-          if (responseInfo is Map && responseInfo.containsKey('body')) {
-            final dynamic responseBody = responseInfo['body'];
-
-            if (responseBody is Map && responseBody.containsKey('users')) {
-              final dynamic users = responseBody['users'];
-
-              // Update the state with the list of users
-              if (users is List) {
-                setState(() {
-                  jsonData = users;
-                });
-              }
-            }
+          if (users is List) {
+            setState(() {
+              jsonData = users;
+            });
           }
         }
       } else {
@@ -90,26 +83,31 @@ class XResultsPageState extends State<XResultsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Instagram Results'),
+        title: const Text('X Results'),
       ),
       body: jsonData.isEmpty
           ? const Center(
               child: SizedBox(
                   height: 125, width: 125, child: CircularProgressIndicator()))
           : ListView.builder(
-              //! length defined explicitly
-              itemCount: 10,
+              physics: const BouncingScrollPhysics(),
+              //!explicitly deifined length
+              itemCount: 6,
               itemBuilder: (context, index) {
-                final user = jsonData[index]['user'];
-
-                return ListTile(
-                  title: Text(user['name'] ?? 'N/A'),
-                  subtitle: Image.network(
-                    user['profile_image_url'] ?? '',
-                    height: 50,
-                    width: 50,
-                  ),
+                final user = jsonData[index];
+                return DisplayContainerX(
+                  name: widget.username,
+                  imgUrl: widget.imgUrl,
+                  user: user,
                 );
+                // return ListTile(
+                //   title: Text(user['name'] ?? 'N/A'),
+                //   subtitle: Image.network(
+                //     user['profile_image_url'] ?? '',
+                //     height: 50,
+                //     width: 50,
+                //   ),
+                // );
               },
             ),
     );
