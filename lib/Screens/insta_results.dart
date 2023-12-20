@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:impersonation_detector/widgets/display_container.dart';
+import 'package:impersonation_detector/Widgets/display_insta.dart';
 
 class InstaResultsPage extends StatefulWidget {
   final String username;
@@ -93,6 +93,7 @@ class InstaResultsPageState extends State<InstaResultsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      
       appBar: AppBar(
         title: const Text('Instagram Results'),
       ),

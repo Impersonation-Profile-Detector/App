@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:impersonation_detector/widgets/display_X.dart';
-import 'package:impersonation_detector/widgets/display_container.dart';
+
 
 class XResultsPage extends StatefulWidget {
   final String imgUrl;
