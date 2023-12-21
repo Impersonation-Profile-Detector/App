@@ -98,7 +98,7 @@ class XResultsPageState extends State<XResultsPage> {
             : ListView.builder(
                 physics: const BouncingScrollPhysics(),
                 //!explicitly deifined length
-                itemCount: 6,
+                itemCount: 1,
                 itemBuilder: (context, index) {
                   final user = jsonData[index];
                   return DisplayContainerX(

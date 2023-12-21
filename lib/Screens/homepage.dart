@@ -27,7 +27,10 @@ class _HomePageState extends State<HomePage> {
     showDialog(
       context: context,
       builder: (context) {
-        return const Center(child: CircularProgressIndicator());
+        return const Center(
+            child: CircularProgressIndicator(
+          color: Colors.white,
+        ));
       },
     );
     try {
@@ -64,7 +67,10 @@ class _HomePageState extends State<HomePage> {
     showDialog(
       context: context,
       builder: (context) {
-        return const Center(child: CircularProgressIndicator());
+        return const Center(
+            child: CircularProgressIndicator(
+          color: Colors.white,
+        ));
       },
     );
     try {
@@ -105,6 +111,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: Container(
         height: MediaQuery.of(context).size.height,
         decoration: const BoxDecoration(
@@ -133,7 +140,7 @@ class _HomePageState extends State<HomePage> {
                         width: 170,
                         child: AvatarGlow(
                           startDelay: const Duration(milliseconds: 1000),
-                          glowColor: Theme.of(context).colorScheme.tertiary,
+                          glowColor: Colors.white,
                           glowShape: BoxShape.circle,
                           animate: true,
                           glowCount: 1,
@@ -145,8 +152,7 @@ class _HomePageState extends State<HomePage> {
                             color: Colors.transparent,
                             child: CircleAvatar(
                               backgroundImage: (_selectedImage == null)
-                                  ? const NetworkImage(
-                                      'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d8/Emblem-person-blue.svg/1200px-Emblem-person-blue.svg.png')
+                                  ? const AssetImage('assets/user.png')
                                   : FileImage(_selectedImage!) as ImageProvider,
                               radius: 50.0,
                             ),

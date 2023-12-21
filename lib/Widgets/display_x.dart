@@ -2,6 +2,7 @@ import 'package:avatar_glow/avatar_glow.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:uuid/uuid.dart';
 
 var uuid = const Uuid();
@@ -68,10 +69,7 @@ class _DisplayContainerXState extends State<DisplayContainerX> {
 
   @override
   void dispose() {
-    FirebaseFirestore.instance
-        .collection('Request_Details')
-        .doc(docID)
-        .delete();
+    FirebaseFirestore.instance.collection('Checked_List').doc(docID).delete();
     super.dispose();
   }
 
@@ -132,12 +130,21 @@ class _DisplayContainerXState extends State<DisplayContainerX> {
                         fontWeight: FontWeight.w400,
                       ),
                     ),
-                    const Text(
-                      'Profile Link',
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontWeight: FontWeight.bold,
-                        decoration: TextDecoration.underline,
+                    GestureDetector(
+                      onTap: () {
+                        String screenName = widget.user['screen_name'] ?? '';
+                        launchUrl(
+                          Uri.parse(
+                              "https://twitter.com/$screenName"),
+                        );
+                      },
+                      child: const Text(
+                        'Profile Link',
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold,
+                          decoration: TextDecoration.underline,
+                        ),
                       ),
                     ),
                   ],
@@ -147,40 +154,42 @@ class _DisplayContainerXState extends State<DisplayContainerX> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12),
               child: StreamBuilder(
-                stream: FirebaseFirestore.instance
-                    .collection('Request_Details')
-                    .doc(docID)
-                    .snapshots(),
-                builder: (context, snapshot) {
-                  var userDocument = snapshot.data;
-                  result = userDocument!["status"];
-                  if (result == 'loading') {
-                    return const SizedBox(
-                        height: 25,
-                        width: 25,
-                        child: CircularProgressIndicator(
-                          color: Color(0xffC62368),
-                        ));
-                  } else if (result == 'true') {
-                    return SizedBox(
-                      height: 36,
-                      width: 36,
-                      child: Tab(
-                        icon: Image.asset('assets/Spy.png'),
-                      ),
-                    );
-                  } else {
-                    return const SizedBox(
-                      height: 36,
-                      width: 36,
-                      child: Icon(
-                        Icons.verified_user,
-                        color: CupertinoColors.activeGreen,
-                      ),
-                    );
-                  }
-                },
-              ),
+                  stream: FirebaseFirestore.instance
+                      .collection('Checked_List')
+                      .doc(docID)
+                      .snapshots(),
+                  builder: (context, snapshot) {
+                    try {
+                      var userDocument = snapshot.data;
+
+                      result = userDocument!["status"];
+                      if (result == 'true') {
+                        return SizedBox(
+                          height: 36,
+                          width: 36,
+                          child: Tab(
+                            icon: Image.asset('assets/Spy.png'),
+                          ),
+                        );
+                      } else {
+                        return const SizedBox(
+                          height: 36,
+                          width: 36,
+                          child: Icon(
+                            Icons.verified_user,
+                            color: CupertinoColors.activeGreen,
+                          ),
+                        );
+                      }
+                    } catch (e) {
+                      return const SizedBox(
+                          height: 25,
+                          width: 25,
+                          child: CircularProgressIndicator(
+                            color: Color(0xffC62368),
+                          ));
+                    }
+                  }),
             )
           ],
         ),

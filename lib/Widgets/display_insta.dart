@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 var uuid = const Uuid();
 
@@ -129,12 +130,19 @@ class _DisplayContainerInstaState extends State<DisplayContainerInsta> {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    const Text(
-                      'Profile Link',
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontWeight: FontWeight.bold,
-                        decoration: TextDecoration.underline,
+                    GestureDetector(
+                      onTap: () {
+                        String userN = widget.user['username'];
+                        launchUrl(Uri.parse(
+                            "https://www.instagram.com/$userN"));
+                      },
+                      child: const Text(
+                        'Profile Link',
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold,
+                          decoration: TextDecoration.underline,
+                        ),
                       ),
                     )
                   ],
@@ -149,32 +157,41 @@ class _DisplayContainerInstaState extends State<DisplayContainerInsta> {
                     .doc(docID)
                     .snapshots(),
                 builder: (context, snapshot) {
-                  var userDocument = snapshot.data;
-                  result = userDocument!["status"];
-                  if (result == 'loading') {
+                  try {
+                    var userDocument = snapshot.data;
+                    result = userDocument!["status"];
+                    if (result == 'loading') {
+                      return const SizedBox(
+                          height: 25,
+                          width: 25,
+                          child: CircularProgressIndicator(
+                            color: Color(0xffC62368),
+                          ));
+                    } else if (result == 'true') {
+                      return SizedBox(
+                        height: 36,
+                        width: 36,
+                        child: Tab(
+                          icon: Image.asset('assets/Spy.png'),
+                        ),
+                      );
+                    } else {
+                      return const SizedBox(
+                        height: 36,
+                        width: 36,
+                        child: Icon(
+                          Icons.verified_user,
+                          color: CupertinoColors.activeGreen,
+                        ),
+                      );
+                    }
+                  } catch (e) {
                     return const SizedBox(
                         height: 25,
                         width: 25,
                         child: CircularProgressIndicator(
                           color: Color(0xffC62368),
                         ));
-                  } else if (result == 'true') {
-                    return SizedBox(
-                      height: 36,
-                      width: 36,
-                      child: Tab(
-                        icon: Image.asset('assets/Spy.png'),
-                      ),
-                    );
-                  } else {
-                    return const SizedBox(
-                      height: 36,
-                      width: 36,
-                      child: Icon(
-                        Icons.verified_user,
-                        color: CupertinoColors.activeGreen,
-                      ),
-                    );
                   }
                 },
               ),
