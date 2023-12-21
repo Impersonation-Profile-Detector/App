@@ -5,7 +5,6 @@ import 'package:image_picker/image_picker.dart';
 import 'package:impersonation_detector/screens/insta_results.dart';
 import 'package:impersonation_detector/screens/x_results.dart';
 import 'package:avatar_glow/avatar_glow.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -313,15 +312,9 @@ class _HomePageState extends State<HomePage> {
                       ),
                       onPressed: () {
                         if (isInsta) {
-                          InstaResultsPage(
-                            username: _name,
-                            imgUrl: imgUrl,
-                          );
+                          submitInstaDetails();
                         } else if (isX) {
-                          XResultsPage(
-                            username: _name,
-                            imgUrl: imgUrl,
-                          );
+                          submitXDetails();
                         }
                       },
                       child: const Text(

@@ -93,27 +93,34 @@ class InstaResultsPageState extends State<InstaResultsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      
-      appBar: AppBar(
-        title: const Text('Instagram Results'),
+      body: Container(
+        height: MediaQuery.of(context).size.height,
+        decoration: const BoxDecoration(
+          image: DecorationImage(
+              image: AssetImage('assets/waves1.png'), fit: BoxFit.cover),
+        ),
+        child: jsonData.isEmpty
+            ? const Center(
+                child: SizedBox(
+                    height: 125,
+                    width: 125,
+                    child: CircularProgressIndicator(
+                      color: Color(0xffffffff),
+                    )))
+            : ListView.builder(
+                physics: const BouncingScrollPhysics(),
+                //! length defined explicitly
+                itemCount: 6,
+                itemBuilder: (context, index) {
+                  final user = jsonData[index]['user'];
+                  return DisplayContainerInsta(
+                    user: user,
+                    name: widget.username,
+                    imgUrl: widget.imgUrl,
+                  );
+                },
+              ),
       ),
-      body: jsonData.isEmpty
-          ? const Center(
-              child: SizedBox(
-                  height: 125, width: 125, child: CircularProgressIndicator()))
-          : ListView.builder(
-              physics: const BouncingScrollPhysics(),
-              //! length defined explicitly
-              itemCount: 6,
-              itemBuilder: (context, index) {
-                final user = jsonData[index]['user'];
-                return DisplayContainerInsta(
-                  user: user,
-                  name: widget.username,
-                  imgUrl: widget.imgUrl,
-                );
-              },
-            ),
     );
   }
 }

@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:impersonation_detector/widgets/display_X.dart';
 
-
 class XResultsPage extends StatefulWidget {
   final String imgUrl;
   final String username;
@@ -82,34 +81,34 @@ class XResultsPageState extends State<XResultsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('X Results'),
+      body: Container(
+        height: MediaQuery.of(context).size.height,
+        decoration: const BoxDecoration(
+          image: DecorationImage(
+              image: AssetImage('assets/waves1.png'), fit: BoxFit.cover),
+        ),
+        child: jsonData.isEmpty
+            ? const Center(
+                child: SizedBox(
+                    height: 125,
+                    width: 125,
+                    child: CircularProgressIndicator(
+                      color: Color(0xffffffff),
+                    )))
+            : ListView.builder(
+                physics: const BouncingScrollPhysics(),
+                //!explicitly deifined length
+                itemCount: 6,
+                itemBuilder: (context, index) {
+                  final user = jsonData[index];
+                  return DisplayContainerX(
+                    name: widget.username,
+                    imgUrl: widget.imgUrl,
+                    user: user,
+                  );
+                },
+              ),
       ),
-      body: jsonData.isEmpty
-          ? const Center(
-              child: SizedBox(
-                  height: 125, width: 125, child: CircularProgressIndicator()))
-          : ListView.builder(
-              physics: const BouncingScrollPhysics(),
-              //!explicitly deifined length
-              itemCount: 6,
-              itemBuilder: (context, index) {
-                final user = jsonData[index];
-                return DisplayContainerX(
-                  name: widget.username,
-                  imgUrl: widget.imgUrl,
-                  user: user,
-                );
-                // return ListTile(
-                //   title: Text(user['name'] ?? 'N/A'),
-                //   subtitle: Image.network(
-                //     user['profile_image_url'] ?? '',
-                //     height: 50,
-                //     width: 50,
-                //   ),
-                // );
-              },
-            ),
     );
   }
 }

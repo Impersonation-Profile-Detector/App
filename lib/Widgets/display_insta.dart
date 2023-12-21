@@ -1,3 +1,4 @@
+import 'package:avatar_glow/avatar_glow.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -38,7 +39,6 @@ class _DisplayContainerInstaState extends State<DisplayContainerInsta> {
   }
 
   void submitRequest() async {
-    
     try {
       uploadDetails(
           name: widget.name,
@@ -75,88 +75,113 @@ class _DisplayContainerInstaState extends State<DisplayContainerInsta> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+      padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 20),
       child: Container(
-          padding: const EdgeInsets.all(8),
-          width: MediaQuery.of(context).size.width,
-          height: 100,
-          decoration: BoxDecoration(
-            border: Border.all(),
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            physics: const AlwaysScrollableScrollPhysics(),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                ClipRRect(
-                  clipBehavior: Clip.antiAlias,
-                  borderRadius: BorderRadius.circular(12),
-                  child: Image.network(
-                    widget.user['profile_pic_url'] ?? '',
-                    height: 70,
+        padding: const EdgeInsets.all(12),
+        width: 320,
+        height: 85,
+        decoration: BoxDecoration(
+          color: const Color(0xffd9d9d9),
+          borderRadius: BorderRadius.circular(15),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            SizedBox(
+              height: 60,
+              width: 60,
+              child: AvatarGlow(
+                startDelay: const Duration(milliseconds: 1000),
+                glowColor: Theme.of(context).colorScheme.tertiary,
+                glowShape: BoxShape.circle,
+                animate: true,
+                glowCount: 1,
+                glowRadiusFactor: 0.2,
+                curve: Curves.fastOutSlowIn,
+                child: Material(
+                  elevation: 8.0,
+                  shape: const CircleBorder(),
+                  color: Colors.transparent,
+                  child: CircleAvatar(
+                    backgroundImage:
+                        NetworkImage(widget.user['profile_pic_url'] ?? ''),
+                    radius: 30.0,
                   ),
                 ),
-                const SizedBox(
-                  width: 10,
-                ),
-                Column(
+              ),
+            ),
+            const SizedBox(
+              width: 20,
+            ),
+            SizedBox(
+              width: 150,
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                physics: const BouncingScrollPhysics(),
+                child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8),
-                      child: Text(
-                        widget.user['full_name'] ?? 'N/A',
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w400,
-                        ),
+                    Text(
+                      widget.user['full_name'] ?? 'N/A',
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
-                    StreamBuilder(
-                      stream: FirebaseFirestore.instance
-                          .collection('Request_Details')
-                          .doc(docID)
-                          .snapshots(),
-                      builder: (context, snapshot) {
-                        var userDocument = snapshot.data;
-                        result = userDocument!["status"];
-                        if (result == 'loading') {
-                          return const SizedBox(
-                              height: 25,
-                              width: 25,
-                              child: CircularProgressIndicator(
-                                color: Colors.blue,
-                              ));
-                        } else if (result == 'true') {
-                          return const Row(
-                            children: [
-                              Icon(
-                                Icons.error_outline,
-                                color: CupertinoColors.systemRed,
-                              ),
-                              Text('Face Matched')
-                            ],
-                          );
-                        } else {
-                          return const Row(
-                            children: [
-                              Icon(
-                                Icons.verified_rounded,
-                                color: CupertinoColors.activeGreen,
-                              ),
-                              Text('Face Notmatched')
-                            ],
-                          );
-                        }
-                      },
+                    const Text(
+                      'Profile Link',
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontWeight: FontWeight.bold,
+                        decoration: TextDecoration.underline,
+                      ),
                     )
                   ],
                 ),
-              ],
+              ),
             ),
-          )),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              child: StreamBuilder(
+                stream: FirebaseFirestore.instance
+                    .collection('Request_Details')
+                    .doc(docID)
+                    .snapshots(),
+                builder: (context, snapshot) {
+                  var userDocument = snapshot.data;
+                  result = userDocument!["status"];
+                  if (result == 'loading') {
+                    return const SizedBox(
+                        height: 25,
+                        width: 25,
+                        child: CircularProgressIndicator(
+                          color: Color(0xffC62368),
+                        ));
+                  } else if (result == 'true') {
+                    return SizedBox(
+                      height: 36,
+                      width: 36,
+                      child: Tab(
+                        icon: Image.asset('assets/Spy.png'),
+                      ),
+                    );
+                  } else {
+                    return const SizedBox(
+                      height: 36,
+                      width: 36,
+                      child: Icon(
+                        Icons.verified_user,
+                        color: CupertinoColors.activeGreen,
+                      ),
+                    );
+                  }
+                },
+              ),
+            )
+          ],
+        ),
+      ),
     );
   }
 }
