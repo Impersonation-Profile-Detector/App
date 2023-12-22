@@ -26,7 +26,6 @@ class _DisplayContainerInstaState extends State<DisplayContainerInsta> {
     required String name,
     required String imgurl,
     required String requesturl,
-    required String status,
   }) async {
     final requestDetails =
         FirebaseFirestore.instance.collection('Request_Details').doc(docID);
@@ -34,7 +33,6 @@ class _DisplayContainerInstaState extends State<DisplayContainerInsta> {
       'Name': name,
       'User_Image': imgurl,
       'Request_Image': requesturl,
-      'status': status,
     };
     await requestDetails.set(json);
   }
@@ -42,10 +40,10 @@ class _DisplayContainerInstaState extends State<DisplayContainerInsta> {
   void submitRequest() async {
     try {
       uploadDetails(
-          name: widget.name,
-          imgurl: widget.imgUrl,
-          requesturl: widget.user['profile_pic_url'],
-          status: 'loading');
+        name: widget.name,
+        imgurl: widget.imgUrl,
+        requesturl: widget.user['profile_pic_url'],
+      );
     } catch (e) {
       ScaffoldMessenger.of(context).clearSnackBars();
       ScaffoldMessenger.of(context).showSnackBar(
@@ -66,10 +64,7 @@ class _DisplayContainerInstaState extends State<DisplayContainerInsta> {
 
   @override
   void dispose() {
-    FirebaseFirestore.instance
-        .collection('Request_Details')
-        .doc(docID)
-        .delete();
+    FirebaseFirestore.instance.collection('Checked_List').doc(docID).delete();
     super.dispose();
   }
 
@@ -133,8 +128,8 @@ class _DisplayContainerInstaState extends State<DisplayContainerInsta> {
                     GestureDetector(
                       onTap: () {
                         String userN = widget.user['username'];
-                        launchUrl(Uri.parse(
-                            "https://www.instagram.com/$userN"));
+                        launchUrl(
+                            Uri.parse("https://www.instagram.com/$userN"));
                       },
                       child: const Text(
                         'Profile Link',
@@ -153,7 +148,7 @@ class _DisplayContainerInstaState extends State<DisplayContainerInsta> {
               padding: const EdgeInsets.symmetric(horizontal: 12),
               child: StreamBuilder(
                 stream: FirebaseFirestore.instance
-                    .collection('Request_Details')
+                    .collection('Checked_List')
                     .doc(docID)
                     .snapshots(),
                 builder: (context, snapshot) {

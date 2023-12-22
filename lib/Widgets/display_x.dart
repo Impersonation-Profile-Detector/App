@@ -29,7 +29,6 @@ class _DisplayContainerXState extends State<DisplayContainerX> {
     required String name,
     required String imgurl,
     required String requesturl,
-    required String status,
   }) async {
     final requestDetails =
         FirebaseFirestore.instance.collection('Request_Details').doc(docID);
@@ -37,7 +36,6 @@ class _DisplayContainerXState extends State<DisplayContainerX> {
       'Name': name,
       'User_Image': imgurl,
       'Request_Image': requesturl,
-      'status': status,
     };
     await requestDetails.set(json);
   }
@@ -45,10 +43,10 @@ class _DisplayContainerXState extends State<DisplayContainerX> {
   void submitRequest() async {
     try {
       uploadDetails(
-          name: widget.name,
-          imgurl: widget.imgUrl,
-          requesturl: widget.user['profile_image_url'],
-          status: 'loading');
+        name: widget.name,
+        imgurl: widget.imgUrl,
+        requesturl: widget.user['profile_image_url'],
+      );
     } catch (e) {
       ScaffoldMessenger.of(context).clearSnackBars();
       ScaffoldMessenger.of(context).showSnackBar(
@@ -134,8 +132,7 @@ class _DisplayContainerXState extends State<DisplayContainerX> {
                       onTap: () {
                         String screenName = widget.user['screen_name'] ?? '';
                         launchUrl(
-                          Uri.parse(
-                              "https://twitter.com/$screenName"),
+                          Uri.parse("https://twitter.com/$screenName"),
                         );
                       },
                       child: const Text(
