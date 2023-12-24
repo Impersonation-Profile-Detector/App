@@ -111,30 +111,6 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        iconTheme: const IconThemeData(color: Colors.white),
-        backgroundColor: const Color(0xff001220),
-      ),
-      drawer: Drawer(
-        clipBehavior: Clip.antiAlias,
-        backgroundColor: const Color(0xffC62368),
-        child: ListView(
-          children: const [
-            ListTile(
-              title: Text(
-                'Disclaimer',
-                style: TextStyle(color: Colors.white),
-              ),
-            ),
-            ListTile(
-              title: Text(
-                'Project By Sushobhan Nayak & Piyush Soni',
-                style: TextStyle(color: Colors.white),
-              ),
-            ),
-          ],
-        ),
-      ),
       resizeToAvoidBottomInset: false,
       body: Container(
         height: MediaQuery.of(context).size.height,
@@ -152,7 +128,7 @@ class _HomePageState extends State<HomePage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const SizedBox(
-                    height: 15,
+                    height: 90,
                   ),
                   GestureDetector(
                     onTap: () {
@@ -217,7 +193,7 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
                   const SizedBox(
-                    height: 12,
+                    height: 20,
                   ),
                   const Text(
                     'Name',
@@ -227,7 +203,7 @@ class _HomePageState extends State<HomePage> {
                         fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(
-                    height: 10,
+                    height: 16,
                   ),
                   SizedBox(
                     width: 290,
@@ -266,7 +242,7 @@ class _HomePageState extends State<HomePage> {
                         fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(
-                    height: 20,
+                    height: 5,
                   ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -340,39 +316,39 @@ class _HomePageState extends State<HomePage> {
                     ],
                   ),
                   const SizedBox(
-                    height: 30,
+                    height: 25,
                   ),
                   SizedBox(
                     height: 40,
                     width: 290,
-                    child: ElevatedButton(
-                      style: const ButtonStyle(
-                        shape: MaterialStatePropertyAll(
-                          RoundedRectangleBorder(
-                            borderRadius: BorderRadius.all(
-                              Radius.circular(10),
+                    child: Hero(
+                      tag: 'home-button',
+                      child: ElevatedButton(
+                        style: const ButtonStyle(
+                          shape: MaterialStatePropertyAll(
+                            RoundedRectangleBorder(
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(10),
+                              ),
                             ),
                           ),
+                          backgroundColor: MaterialStatePropertyAll(
+                            Color.fromARGB(255, 237, 236, 236),
+                          ),
                         ),
-                        shadowColor: MaterialStatePropertyAll(
-                          Color.fromARGB(81, 0, 0, 0),
+                        onPressed: () {
+                          if (isInsta) {
+                            submitInstaDetails();
+                          } else if (isX) {
+                            submitXDetails();
+                          }
+                        },
+                        child: const Text(
+                          'Find Profiles',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xff1e1e1e)),
                         ),
-                        backgroundColor: MaterialStatePropertyAll(
-                          Color(0xffd9d9d9),
-                        ),
-                      ),
-                      onPressed: () {
-                        if (isInsta) {
-                          submitInstaDetails();
-                        } else if (isX) {
-                          submitXDetails();
-                        }
-                      },
-                      child: const Text(
-                        'Find Profiles',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xff1e1e1e)),
                       ),
                     ),
                   )
