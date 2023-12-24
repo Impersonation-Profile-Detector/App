@@ -111,6 +111,30 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        iconTheme: const IconThemeData(color: Colors.white),
+        backgroundColor: const Color(0xff001220),
+      ),
+      drawer: Drawer(
+        clipBehavior: Clip.antiAlias,
+        backgroundColor: const Color(0xffC62368),
+        child: ListView(
+          children: const [
+            ListTile(
+              title: Text(
+                'Disclaimer',
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
+            ListTile(
+              title: Text(
+                'Project By Sushobhan Nayak & Piyush Soni',
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
+          ],
+        ),
+      ),
       resizeToAvoidBottomInset: false,
       body: Container(
         height: MediaQuery.of(context).size.height,
@@ -128,11 +152,42 @@ class _HomePageState extends State<HomePage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const SizedBox(
-                    height: 90,
+                    height: 15,
                   ),
                   GestureDetector(
                     onTap: () {
-                      _getFromCamera();
+                      showDialog(
+                          context: context,
+                          barrierDismissible: false, // user must tap button!
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: const Text('Upload Image'),
+                              content: const SingleChildScrollView(
+                                child: ListBody(
+                                  children: <Widget>[
+                                    Text(
+                                        'From where would you like to upload image ?'),
+                                  ],
+                                ),
+                              ),
+                              actions: <Widget>[
+                                TextButton(
+                                  child: const Text('Gallery'),
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                    _getFromCamera(false);
+                                  },
+                                ),
+                                TextButton(
+                                  child: const Text('Camera'),
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                    _getFromCamera(true);
+                                  },
+                                ),
+                              ],
+                            );
+                          });
                     },
                     child: Center(
                       child: SizedBox(
@@ -144,7 +199,7 @@ class _HomePageState extends State<HomePage> {
                           glowShape: BoxShape.circle,
                           animate: true,
                           glowCount: 1,
-                          glowRadiusFactor: 0.3,
+                          glowRadiusFactor: 0.2,
                           curve: Curves.fastOutSlowIn,
                           child: Material(
                             elevation: 8.0,
@@ -162,7 +217,7 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
                   const SizedBox(
-                    height: 18,
+                    height: 12,
                   ),
                   const Text(
                     'Name',
@@ -201,7 +256,7 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
                   const SizedBox(
-                    height: 30,
+                    height: 20,
                   ),
                   const Text(
                     'Select the SNS',
@@ -211,7 +266,7 @@ class _HomePageState extends State<HomePage> {
                         fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(
-                    height: 10,
+                    height: 20,
                   ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -223,36 +278,31 @@ class _HomePageState extends State<HomePage> {
                             isX = false;
                           });
                         },
-                        child: isInsta
-                            ? Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Tab(
-                                    icon: Image.asset("assets/insta_dark.png"),
-                                    height: 120,
-                                  ),
-                                  const Text(
-                                    'Instagram',
-                                    style: TextStyle(
-                                        color: Colors.black,
-                                        fontWeight: FontWeight.bold),
-                                  )
-                                ],
-                              )
-                            : Column(
-                                children: [
-                                  Tab(
-                                    icon: Image.asset("assets/insta.png"),
-                                    height: 120,
-                                  ),
-                                  const Text(
-                                    'Instagram',
-                                    style: TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.bold),
-                                  )
-                                ],
+                        child: Container(
+                          height: 150,
+                          width: 100,
+                          decoration: isInsta
+                              ? BoxDecoration(
+                                  borderRadius: BorderRadius.circular(15),
+                                  border:
+                                      Border.all(color: Colors.white, width: 2),
+                                )
+                              : const BoxDecoration(),
+                          child: Column(
+                            children: [
+                              Tab(
+                                icon: Image.asset("assets/insta.png"),
+                                height: 120,
                               ),
+                              const Text(
+                                'Instagram',
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold),
+                              )
+                            ],
+                          ),
+                        ),
                       ),
                       GestureDetector(
                         onTap: () {
@@ -261,36 +311,31 @@ class _HomePageState extends State<HomePage> {
                             isInsta = false;
                           });
                         },
-                        child: isX
-                            ? Column(
-                                children: [
-                                  Tab(
-                                    icon:
-                                        Image.asset("assets/twitter_dark.png"),
-                                    height: 120,
-                                  ),
-                                  const Text(
-                                    'Twitter X',
-                                    style: TextStyle(
-                                        color: Colors.black,
-                                        fontWeight: FontWeight.bold),
-                                  )
-                                ],
-                              )
-                            : Column(
-                                children: [
-                                  Tab(
-                                    icon: Image.asset("assets/twitter.png"),
-                                    height: 120,
-                                  ),
-                                  const Text(
-                                    'Twitter X',
-                                    style: TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.bold),
-                                  )
-                                ],
+                        child: Container(
+                          height: 150,
+                          width: 100,
+                          decoration: isX
+                              ? BoxDecoration(
+                                  borderRadius: BorderRadius.circular(15),
+                                  border:
+                                      Border.all(color: Colors.white, width: 2),
+                                )
+                              : const BoxDecoration(),
+                          child: Column(
+                            children: [
+                              Tab(
+                                icon: Image.asset("assets/twitter.png"),
+                                height: 120,
                               ),
+                              const Text(
+                                'Twitter X',
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold),
+                              )
+                            ],
+                          ),
+                        ),
                       ),
                     ],
                   ),
@@ -338,9 +383,9 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Future _getFromCamera() async {
-    final returnedImage = await ImagePicker().pickImage(
-        source: ImageSource.camera, preferredCameraDevice: CameraDevice.front);
+  Future _getFromCamera(bool con) async {
+    final returnedImage = await ImagePicker()
+        .pickImage(source: con ? ImageSource.camera : ImageSource.gallery);
     if (returnedImage == null) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
