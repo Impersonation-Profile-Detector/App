@@ -19,57 +19,46 @@ class DisplayContainerInsta extends StatefulWidget {
 }
 
 class _DisplayContainerInstaState extends State<DisplayContainerInsta> {
-  String docID = uuid.v1();
-  String result = 'loading';
-
-  Future uploadDetails({
-    required String name,
-    required String imgurl,
-    required String requesturl,
-  }) async {
-    final requestDetails =
-        FirebaseFirestore.instance.collection('Request_Details').doc(docID);
-    final json = {
-      'Name': name,
-      'User_Image': imgurl,
-      'Request_Image': requesturl,
-    };
-    await requestDetails.set(json);
-  }
-
-  void submitRequest() async {
-    try {
-      uploadDetails(
-        name: widget.name,
-        imgurl: widget.imgUrl,
-        requesturl: widget.user['profile_pic_url'],
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).clearSnackBars();
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            e.toString(),
-          ),
-        ),
-      );
-    }
-  }
-
-  @override
-  void initState() {
-    submitRequest();
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    FirebaseFirestore.instance.collection('Checked_List').doc(docID).delete();
-    super.dispose();
-  }
-
   @override
   Widget build(BuildContext context) {
+    String docID = uuid.v1();
+    String result = 'loading';
+
+    Future uploadDetails({
+      required String name,
+      required String imgurl,
+      required String requesturl,
+    }) async {
+      final requestDetails =
+          FirebaseFirestore.instance.collection('Request_Details').doc(docID);
+      final json = {
+        'Name': name,
+        'User_Image': imgurl,
+        'Request_Image': requesturl,
+      };
+      await requestDetails.set(json);
+    }
+
+    void submitRequest() async {
+      try {
+        uploadDetails(
+          name: widget.name,
+          imgurl: widget.imgUrl,
+          requesturl: widget.user['profile_pic_url'],
+        );
+      } catch (e) {
+        ScaffoldMessenger.of(context).clearSnackBars();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              e.toString(),
+            ),
+          ),
+        );
+      }
+    }
+
+    submitRequest();
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 20),
       child: Container(
@@ -162,6 +151,26 @@ class _DisplayContainerInstaState extends State<DisplayContainerInsta> {
                           child: CircularProgressIndicator(
                             color: Color(0xffC62368),
                           ));
+                    } else {
+                      FirebaseFirestore.instance
+                          .collection('Checked_List')
+                          .doc(docID)
+                          .delete();
+                      return const SizedBox(
+                          height: 25,
+                          width: 25,
+                          child: CircularProgressIndicator(
+                            color: Color(0xffC62368),
+                          ));
+                    }
+                  } catch (e) {
+                    if (result == 'loading') {
+                      return const SizedBox(
+                          height: 25,
+                          width: 25,
+                          child: CircularProgressIndicator(
+                            color: Color(0xffC62368),
+                          ));
                     } else if (result == 'true') {
                       return SizedBox(
                         height: 36,
@@ -180,13 +189,6 @@ class _DisplayContainerInstaState extends State<DisplayContainerInsta> {
                         ),
                       );
                     }
-                  } catch (e) {
-                    return const SizedBox(
-                        height: 25,
-                        width: 25,
-                        child: CircularProgressIndicator(
-                          color: Color(0xffC62368),
-                        ));
                   }
                 },
               ),

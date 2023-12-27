@@ -6,6 +6,7 @@ import 'package:impersonation_detector/widgets/display_X.dart';
 class XResultsPage extends StatefulWidget {
   final String imgUrl;
   final String username;
+
   const XResultsPage({Key? key, required this.username, required this.imgUrl})
       : super(key: key);
 
@@ -15,6 +16,7 @@ class XResultsPage extends StatefulWidget {
 
 class XResultsPageState extends State<XResultsPage> {
   List<dynamic> jsonData = [];
+  int currentPage = 1;
 
   @override
   void initState() {
@@ -79,8 +81,22 @@ class XResultsPageState extends State<XResultsPage> {
   }
 
   @override
+  void dispose() {
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        iconTheme: const IconThemeData(color: Colors.white),
+        backgroundColor: const Color(0xff001220),
+        title: const Text(
+          'X Results',
+          style: TextStyle(color: Colors.white),
+        ),
+        centerTitle: true,
+      ),
       body: Container(
         height: MediaQuery.of(context).size.height,
         decoration: const BoxDecoration(
@@ -95,19 +111,38 @@ class XResultsPageState extends State<XResultsPage> {
                     child: CircularProgressIndicator(
                       color: Color(0xffffffff),
                     )))
-            : ListView.builder(
-                physics: const BouncingScrollPhysics(),
-                //!explicitly deifined length
-                itemCount: 6,
-                itemBuilder: (context, index) {
-                  final user = jsonData[index];
-                  return DisplayContainerX(
-                    name: widget.username,
-                    imgUrl: widget.imgUrl,
-                    user: user,
-                  );
-                },
-              ),
+            : Column(children: [
+                Expanded(
+                  child: ListView.builder(
+                      physics: const BouncingScrollPhysics(),
+                      //!explicitly deifined length
+                      itemCount: 5,
+                      itemBuilder: (context, index) {
+                        final actualIndex = (currentPage - 1) * 5 + index;
+                        if (actualIndex < jsonData.length) {
+                          final user = jsonData[actualIndex];
+                          return DisplayContainerX(
+                            name: widget.username,
+                            imgUrl: widget.imgUrl,
+                            user: user,
+                          );
+                        } else {
+                          return Container();
+                        }
+                      }),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 20),
+                  child: ElevatedButton(
+                    onPressed: () {
+                      setState(() {
+                        currentPage++;
+                      });
+                    },
+                    child: const Text('Next Page'),
+                  ),
+                )
+              ]),
       ),
     );
   }

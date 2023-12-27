@@ -249,6 +249,7 @@ class _HomePageState extends State<HomePage> {
                     children: [
                       GestureDetector(
                         onTap: () {
+                          FocusManager.instance.primaryFocus?.unfocus();
                           setState(() {
                             isInsta = !isInsta;
                             isX = false;
@@ -282,6 +283,7 @@ class _HomePageState extends State<HomePage> {
                       ),
                       GestureDetector(
                         onTap: () {
+                          FocusManager.instance.primaryFocus?.unfocus();
                           setState(() {
                             isX = !isX;
                             isInsta = false;

@@ -38,6 +38,12 @@ class OnboardSreen extends StatelessWidget {
                     color: Colors.white60,
                     borderRadius: BorderRadius.circular(20),
                   ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(20),
+                    child: Image.asset(
+                      'assets/social.png',
+                    ),
+                  ),
                 ),
                 const SizedBox(
                   height: 25,
@@ -59,7 +65,8 @@ class OnboardSreen extends StatelessWidget {
                         Navigator.push(
                           context,
                           PageRouteBuilder(
-                            transitionDuration: const Duration(milliseconds: 300),
+                            transitionDuration:
+                                const Duration(milliseconds: 300),
                             pageBuilder: (_, __, ___) => const HomePage(),
                           ),
                         );
