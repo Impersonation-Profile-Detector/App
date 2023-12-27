@@ -7,6 +7,7 @@ import 'package:impersonation_detector/widgets/display_container.dart';
 class XResultsPage extends StatefulWidget {
   final String imgUrl;
   final String username;
+
   const XResultsPage({Key? key, required this.username, required this.imgUrl})
       : super(key: key);
 
@@ -16,6 +17,7 @@ class XResultsPage extends StatefulWidget {
 
 class XResultsPageState extends State<XResultsPage> {
   List<dynamic> jsonData = [];
+  int currentPage = 1;
 
   @override
   void initState() {
@@ -82,8 +84,54 @@ class XResultsPageState extends State<XResultsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+<<<<<<< Updated upstream
       appBar: AppBar(
         title: const Text('X Results'),
+=======
+      body: Container(
+        height: MediaQuery.of(context).size.height,
+        decoration: const BoxDecoration(
+          image: DecorationImage(
+              image: AssetImage('assets/waves1.png'), fit: BoxFit.cover),
+        ),
+        child: jsonData.isEmpty
+            ? const Center(
+                child: SizedBox(
+                    height: 125,
+                    width: 125,
+                    child: CircularProgressIndicator(
+                      color: Color(0xffffffff),
+                    )))
+            : Column(children: [
+                Expanded(
+                  child: ListView.builder(
+                      physics: const BouncingScrollPhysics(),
+                      //!explicitly deifined length
+                      itemCount: 6,
+                      itemBuilder: (context, index) {
+                        final actualIndex = (currentPage - 1) * 6 + index;
+                        if (actualIndex < jsonData.length) {
+                          final user = jsonData[actualIndex];
+                          return DisplayContainerX(
+                            name: widget.username,
+                            imgUrl: widget.imgUrl,
+                            user: user,
+                          );
+                        } else {
+                          return Container();
+                        }
+                      }),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    setState(() {
+                      currentPage++;
+                    });
+                  },
+                  child: const Text('Next Page'),
+                )
+              ]),
+>>>>>>> Stashed changes
       ),
       body: jsonData.isEmpty
           ? const Center(
