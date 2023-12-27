@@ -18,7 +18,6 @@ class InstaResultsPage extends StatefulWidget {
 class InstaResultsPageState extends State<InstaResultsPage> {
   List<dynamic> jsonData = [];
   int currentPage = 1;
-
   @override
   void initState() {
     super.initState();

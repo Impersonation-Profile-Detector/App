@@ -17,7 +17,6 @@ class XResultsPage extends StatefulWidget {
 class XResultsPageState extends State<XResultsPage> {
   List<dynamic> jsonData = [];
   int currentPage = 1;
-
   @override
   void initState() {
     super.initState();
