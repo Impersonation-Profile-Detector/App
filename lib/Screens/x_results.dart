@@ -6,6 +6,7 @@ import 'package:impersonation_detector/widgets/display_X.dart';
 class XResultsPage extends StatefulWidget {
   final String imgUrl;
   final String username;
+
   const XResultsPage({Key? key, required this.username, required this.imgUrl})
       : super(key: key);
 
@@ -16,7 +17,6 @@ class XResultsPage extends StatefulWidget {
 class XResultsPageState extends State<XResultsPage> {
   List<dynamic> jsonData = [];
   int currentPage = 1;
-  
   @override
   void initState() {
     super.initState();

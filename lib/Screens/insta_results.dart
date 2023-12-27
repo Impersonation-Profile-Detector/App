@@ -6,6 +6,7 @@ import 'package:impersonation_detector/Widgets/display_insta.dart';
 class InstaResultsPage extends StatefulWidget {
   final String username;
   final String imgUrl;
+
   const InstaResultsPage(
       {Key? key, required this.username, required this.imgUrl})
       : super(key: key);
