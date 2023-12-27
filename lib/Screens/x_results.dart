@@ -15,7 +15,8 @@ class XResultsPage extends StatefulWidget {
 
 class XResultsPageState extends State<XResultsPage> {
   List<dynamic> jsonData = [];
-
+  int currentPage = 1;
+  
   @override
   void initState() {
     super.initState();
@@ -95,19 +96,35 @@ class XResultsPageState extends State<XResultsPage> {
                     child: CircularProgressIndicator(
                       color: Color(0xffffffff),
                     )))
-            : ListView.builder(
-                physics: const BouncingScrollPhysics(),
-                //!explicitly deifined length
-                itemCount: 6,
-                itemBuilder: (context, index) {
-                  final user = jsonData[index];
-                  return DisplayContainerX(
-                    name: widget.username,
-                    imgUrl: widget.imgUrl,
-                    user: user,
-                  );
-                },
-              ),
+            : Column(children: [
+                Expanded(
+                  child: ListView.builder(
+                      physics: const BouncingScrollPhysics(),
+                      //!explicitly deifined length
+                      itemCount: 6,
+                      itemBuilder: (context, index) {
+                        final actualIndex = (currentPage - 1) * 6 + index;
+                        if (actualIndex < jsonData.length) {
+                          final user = jsonData[actualIndex];
+                          return DisplayContainerX(
+                            name: widget.username,
+                            imgUrl: widget.imgUrl,
+                            user: user,
+                          );
+                        } else {
+                          return Container();
+                        }
+                      }),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    setState(() {
+                      currentPage++;
+                    });
+                  },
+                  child: const Text('Next Page'),
+                )
+              ]),
       ),
     );
   }

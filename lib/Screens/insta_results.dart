@@ -16,7 +16,7 @@ class InstaResultsPage extends StatefulWidget {
 
 class InstaResultsPageState extends State<InstaResultsPage> {
   List<dynamic> jsonData = [];
-
+  int currentPage = 1;
   @override
   void initState() {
     super.initState();
@@ -107,19 +107,36 @@ class InstaResultsPageState extends State<InstaResultsPage> {
                     child: CircularProgressIndicator(
                       color: Color(0xffffffff),
                     )))
-            : ListView.builder(
-                physics: const BouncingScrollPhysics(),
-                //! length defined explicitly
-                itemCount: 6,
-                itemBuilder: (context, index) {
-                  final user = jsonData[index]['user'];
-                  return DisplayContainerInsta(
-                    user: user,
-                    name: widget.username,
-                    imgUrl: widget.imgUrl,
-                  );
-                },
-              ),
+            : Column(children: [
+                Expanded(
+                  child: ListView.builder(
+                    physics: const BouncingScrollPhysics(),
+                    //! length defined explicitly
+                    itemCount: 6,
+                    itemBuilder: (context, index) {
+                      final actualIndex = (currentPage - 1) * 6 + index;
+                      if (actualIndex < jsonData.length) {
+                        final user = jsonData[actualIndex]['user'];
+                        return DisplayContainerInsta(
+                          user: user,
+                          name: widget.username,
+                          imgUrl: widget.imgUrl,
+                        );
+                      } else {
+                        return Container();
+                      }
+                    },
+                  ),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    setState(() {
+                      currentPage++;
+                    });
+                  },
+                  child: const Text('Next Page'),
+                )
+              ]),
       ),
     );
   }
