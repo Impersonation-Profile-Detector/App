@@ -61,8 +61,9 @@ To run the project locally, follow these steps:
 
 1. Clone the repository.
 2. Set up Firebase configurations in `firebase_options.dart`.
-3. Ensure Flutter is installed and run `flutter pub get` to install dependencies.
-4. Run the application using `flutter run`.
+3. Set up the api keys for Instagram and X APIs respectively.
+4. Ensure Flutter is installed and run `flutter pub get` to install dependencies.
+5. Run the application using `flutter run`.
 
 ## Contributions
 
