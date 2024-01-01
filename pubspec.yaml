@@ -43,6 +43,8 @@ dependencies:
   avatar_glow: ^3.0.1
   flutter_svg: ^2.0.9
   url_launcher: ^6.2.2
+  images_picker: ^1.2.11
+  camera_camera: ^3.0.0
 
 dev_dependencies:
   flutter_test:

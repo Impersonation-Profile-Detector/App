@@ -2,9 +2,12 @@ import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:impersonation_detector/Screens/camera.dart';
 import 'package:impersonation_detector/screens/insta_results.dart';
 import 'package:impersonation_detector/screens/x_results.dart';
 import 'package:avatar_glow/avatar_glow.dart';
+import 'package:images_picker/images_picker.dart';
+import 'package:camera_camera/camera_camera.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -151,14 +154,26 @@ class _HomePageState extends State<HomePage> {
                                   child: const Text('Gallery'),
                                   onPressed: () {
                                     Navigator.of(context).pop();
-                                    _getFromCamera(false);
+                                    getImage();
                                   },
                                 ),
                                 TextButton(
                                   child: const Text('Camera'),
                                   onPressed: () {
                                     Navigator.of(context).pop();
-                                    _getFromCamera(true);
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => Camera(
+                                          onPickedImage: (File pickedImage) {
+                                            setState(() {
+                                              _selectedImage =
+                                                  File(pickedImage.path);
+                                            });
+                                          },
+                                        ),
+                                      ),
+                                    );
                                   },
                                 ),
                               ],
@@ -361,20 +376,33 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Future _getFromCamera(bool con) async {
-    final returnedImage = await ImagePicker()
-        .pickImage(source: con ? ImageSource.camera : ImageSource.gallery);
-    if (returnedImage == null) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('We are facing some issue.Try again later'),
-        ),
-      );
-      return;
-    }
+//  Future _getFromCamera(bool con) async {
+//     try {
+//       final returnedImage = await ImagePicker()
+//           .pickImage(source: con ? ImageSource.camera : ImageSource.gallery);
+//       if (returnedImage == null) {
+//         if (!mounted) return;
+//         ScaffoldMessenger.of(context).showSnackBar(
+//           const SnackBar(
+//             content: Text('We are facing some issue.Try again later'),
+//           ),
+//         );
+//         return;
+//       }
+//       setState(() {
+//         _selectedImage = File(returnedImage.path);
+//       });
+//     } catch (e) {
+//       print(e);
+//     }
+//   }
+  Future getImage() async {
+    List<Media>? res = await ImagesPicker.pick(
+      count: 1,
+      pickType: PickType.image,
+    );
     setState(() {
-      _selectedImage = File(returnedImage.path);
+      _selectedImage = File(res!.first.path);
     });
   }
 }

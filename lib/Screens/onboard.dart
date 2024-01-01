@@ -66,7 +66,7 @@ class OnboardSreen extends StatelessWidget {
                           context,
                           PageRouteBuilder(
                             transitionDuration:
-                                const Duration(milliseconds: 300),
+                                const Duration(milliseconds: 400),
                             pageBuilder: (_, __, ___) => const HomePage(),
                           ),
                         );
