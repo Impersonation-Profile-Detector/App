@@ -45,6 +45,7 @@ dependencies:
   url_launcher: ^6.2.2
   images_picker: ^1.2.11
   camera_camera: ^3.0.0
+  flutter_image_compress: ^2.1.0
 
 dev_dependencies:
   flutter_test:

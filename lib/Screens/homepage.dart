@@ -1,13 +1,12 @@
 import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:impersonation_detector/Screens/camera.dart';
 import 'package:impersonation_detector/screens/insta_results.dart';
 import 'package:impersonation_detector/screens/x_results.dart';
 import 'package:avatar_glow/avatar_glow.dart';
 import 'package:images_picker/images_picker.dart';
-import 'package:camera_camera/camera_camera.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -22,6 +21,7 @@ class _HomePageState extends State<HomePage> {
   String _name = "";
   File? _selectedImage;
   String imgUrl = "";
+  String compressedImagePath = "/storage/emulated/0/Download/";
 
   final _controller = TextEditingController();
   bool validate = false;
@@ -137,7 +137,7 @@ class _HomePageState extends State<HomePage> {
                     onTap: () {
                       showDialog(
                           context: context,
-                          barrierDismissible: false, // user must tap button!
+                          barrierDismissible: false, 
                           builder: (BuildContext context) {
                             return AlertDialog(
                               title: const Text('Upload Image'),
@@ -154,26 +154,14 @@ class _HomePageState extends State<HomePage> {
                                   child: const Text('Gallery'),
                                   onPressed: () {
                                     Navigator.of(context).pop();
-                                    getImage();
+                                    getImageGallery();
                                   },
                                 ),
                                 TextButton(
                                   child: const Text('Camera'),
                                   onPressed: () {
                                     Navigator.of(context).pop();
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => Camera(
-                                          onPickedImage: (File pickedImage) {
-                                            setState(() {
-                                              _selectedImage =
-                                                  File(pickedImage.path);
-                                            });
-                                          },
-                                        ),
-                                      ),
-                                    );
+                                    getImageCamera();
                                   },
                                 ),
                               ],
@@ -376,27 +364,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-//  Future _getFromCamera(bool con) async {
-//     try {
-//       final returnedImage = await ImagePicker()
-//           .pickImage(source: con ? ImageSource.camera : ImageSource.gallery);
-//       if (returnedImage == null) {
-//         if (!mounted) return;
-//         ScaffoldMessenger.of(context).showSnackBar(
-//           const SnackBar(
-//             content: Text('We are facing some issue.Try again later'),
-//           ),
-//         );
-//         return;
-//       }
-//       setState(() {
-//         _selectedImage = File(returnedImage.path);
-//       });
-//     } catch (e) {
-//       print(e);
-//     }
-//   }
-  Future getImage() async {
+  Future getImageGallery() async {
     List<Media>? res = await ImagesPicker.pick(
       count: 1,
       pickType: PickType.image,
@@ -404,5 +372,34 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       _selectedImage = File(res!.first.path);
     });
+    compressImage();
+  }
+
+  Future getImageCamera() async {
+    Navigator.of(context).pop();
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => Camera(
+          onPickedImage: (File pickedImage) {
+            setState(() {
+              _selectedImage = File(pickedImage.path);
+            });
+          },
+        ),
+      ),
+    );
+    compressImage();
+  }
+
+  Future compressImage() async {
+    if (_selectedImage == null) return null;
+    final compressedFile = await FlutterImageCompress.compressAndGetFile(
+      _selectedImage!.path,
+      "$compressedImagePath/file.jpg",
+    );
+    if (compressedFile != null) {
+      _selectedImage = File(compressedFile.path);
+    }
   }
 }

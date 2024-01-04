@@ -15,6 +15,7 @@ class _CameraState extends State<Camera> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: CameraCamera(
+        resolutionPreset: ResolutionPreset.values[150],
         cameraSide: CameraSide.all,
         onFile: (file) {
           widget.onPickedImage(file);
