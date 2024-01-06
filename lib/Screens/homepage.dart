@@ -7,6 +7,7 @@ import 'package:impersonation_detector/screens/x_results.dart';
 import 'package:avatar_glow/avatar_glow.dart';
 import 'package:images_picker/images_picker.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -105,6 +106,36 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  Future<void> requestPermission() async {
+    const cameraPermission = Permission.camera;
+    const externalPermission = Permission.manageExternalStorage;
+    const photosPermission = Permission.photos;
+    const mediaPermission = Permission.mediaLibrary;
+    const writePermission = Permission.storage;
+
+    if (await cameraPermission.isDenied) {
+      await cameraPermission.request();
+    }
+    if (await externalPermission.isDenied) {
+      await externalPermission.request();
+    }
+    if (await photosPermission.isDenied) {
+      await photosPermission.request();
+    }
+    if (await mediaPermission.isDenied) {
+      await mediaPermission.request();
+    }
+    if (await writePermission.isDenied) {
+      await writePermission.request();
+    }
+  }
+
+  @override
+  void initState() {
+    requestPermission();
+    super.initState();
+  }
+
   @override
   void dispose() {
     _controller.dispose();
@@ -137,7 +168,7 @@ class _HomePageState extends State<HomePage> {
                     onTap: () {
                       showDialog(
                           context: context,
-                          barrierDismissible: false, 
+                          barrierDismissible: false,
                           builder: (BuildContext context) {
                             return AlertDialog(
                               title: const Text('Upload Image'),
@@ -372,24 +403,23 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       _selectedImage = File(res!.first.path);
     });
-    compressImage();
   }
 
   Future getImageCamera() async {
-    Navigator.of(context).pop();
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => Camera(
           onPickedImage: (File pickedImage) {
-            setState(() {
-              _selectedImage = File(pickedImage.path);
-            });
+            if (mounted) {
+              setState(() {
+                _selectedImage = File(pickedImage.path);
+              });
+            }
           },
         ),
       ),
     );
-    compressImage();
   }
 
   Future compressImage() async {
@@ -401,5 +431,6 @@ class _HomePageState extends State<HomePage> {
     if (compressedFile != null) {
       _selectedImage = File(compressedFile.path);
     }
+    compressImage();
   }
 }

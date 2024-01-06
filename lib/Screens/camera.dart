@@ -15,8 +15,9 @@ class _CameraState extends State<Camera> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: CameraCamera(
-        resolutionPreset: ResolutionPreset.values[150],
+        resolutionPreset: ResolutionPreset.max,
         cameraSide: CameraSide.all,
+        mode: CameraMode.ratio16s9,
         onFile: (file) {
           widget.onPickedImage(file);
           Navigator.pop(context);

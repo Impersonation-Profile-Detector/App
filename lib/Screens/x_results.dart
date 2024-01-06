@@ -25,14 +25,14 @@ class XResultsPageState extends State<XResultsPage> {
 
   Future<void> fetchData() async {
     // API endpoint and headers
-    const url = 'https://twitter135.p.rapidapi.com/AutoComplete/';
+    const url = 'https://twitter-api45.p.rapidapi.com/search.php';
     final headers = {
       'content-type': 'application/json',
       'X-RapidAPI-Key': 'e33db81bf2msh8b2a2c7b8cf5363p1c7fbbjsn2617a896ce97',
-      'X-RapidAPI-Host': 'twitter135.p.rapidapi.com',
+      'X-RapidAPI-Host': 'twitter-api45.p.rapidapi.com',
     };
 
-    String finalUrl = '$url?q=${widget.username}';
+    String finalUrl = '$url?query=${widget.username}&search_type=People';
 
     try {
       // Perform the HTTP GET request
@@ -47,8 +47,8 @@ class XResultsPageState extends State<XResultsPage> {
         // print('Full JSON Response: $responseData');
 
         // Check and extract information from the response
-        if (responseData is Map && responseData.containsKey('users')) {
-          final dynamic users = responseData['users'];
+        if (responseData is Map && responseData.containsKey('timeline')) {
+          final dynamic users = responseData['timeline'];
           // Update the state with the list of users
 
           if (users is List) {

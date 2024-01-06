@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:avatar_glow/avatar_glow.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
@@ -22,7 +24,7 @@ class _DisplayContainerInstaState extends State<DisplayContainerInsta> {
   @override
   Widget build(BuildContext context) {
     String docID = uuid.v1();
-    String result = 'loading';
+    double result = 0.0;
 
     Future uploadDetails({
       required String name,
@@ -99,7 +101,7 @@ class _DisplayContainerInstaState extends State<DisplayContainerInsta> {
               width: 20,
             ),
             SizedBox(
-              width: 150,
+              width: 160,
               child: SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 physics: const BouncingScrollPhysics(),
@@ -144,7 +146,7 @@ class _DisplayContainerInstaState extends State<DisplayContainerInsta> {
                   try {
                     var userDocument = snapshot.data;
                     result = userDocument!["status"];
-                    if (result == 'loading') {
+                    if (result == 0.0) {
                       return const SizedBox(
                           height: 25,
                           width: 25,
@@ -164,31 +166,53 @@ class _DisplayContainerInstaState extends State<DisplayContainerInsta> {
                           ));
                     }
                   } catch (e) {
-                    if (result == 'loading') {
+                    if (result == 0.0) {
                       return const SizedBox(
                           height: 25,
                           width: 25,
                           child: CircularProgressIndicator(
                             color: Color(0xffC62368),
                           ));
-                    } else if (result == 'true') {
-                      return SizedBox(
-                        height: 36,
-                        width: 36,
-                        child: Tab(
-                          icon: Image.asset('assets/Spy.png'),
-                        ),
-                      );
                     } else {
-                      return const SizedBox(
-                        height: 36,
-                        width: 36,
-                        child: Icon(
-                          Icons.verified_user,
-                          color: CupertinoColors.activeGreen,
+                      return Text(
+                        "${((1 - result) * 100).ceil()}%",
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: result > 0.4
+                              ? CupertinoColors.activeGreen
+                              : CupertinoColors.systemRed,
+                          fontWeight: FontWeight.bold,
                         ),
                       );
                     }
+                    //  else if (result <= 0.4) {
+                    //   return SizedBox(
+                    //     height: 36,
+                    //     width: 80,
+                    //     child: Row(
+                    //       children: [
+                    //         Tab(
+                    //           icon: Image.asset('assets/Spy.png'),
+                    //         ),
+                    //         Text("${((1 - result)*100).ceil()}%")
+                    //       ],
+                    //     ),
+                    //   );
+                    // } else {
+                    //   return SizedBox(
+                    //     height: 36,
+                    //     width: 60,
+                    //     child: Row(
+                    //       children: [
+                    //         const Icon(
+                    //           Icons.verified_user,
+                    //           color: CupertinoColors.activeGreen,
+                    //         ),
+                    //         Text("${((1 - result) * 100).ceil()}%")
+                    //       ],
+                    //     ),
+                    //   );
+                    // }
                   }
                 },
               ),

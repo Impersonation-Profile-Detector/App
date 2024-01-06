@@ -25,7 +25,7 @@ class _DisplayContainerXState extends State<DisplayContainerX> {
   @override
   Widget build(BuildContext context) {
     String docID = uuid.v1();
-    String result = 'loading';
+    double result = 0.0;
 
     Future uploadDetails({
       required String name,
@@ -47,7 +47,7 @@ class _DisplayContainerXState extends State<DisplayContainerX> {
         uploadDetails(
           name: widget.name,
           imgurl: widget.imgUrl,
-          requesturl: widget.user['profile_image_url'],
+          requesturl: widget.user['avatar'].replaceFirst("normal", "400x400"),
         );
       } catch (e) {
         ScaffoldMessenger.of(context).clearSnackBars();
@@ -92,8 +92,9 @@ class _DisplayContainerXState extends State<DisplayContainerX> {
                   shape: const CircleBorder(),
                   color: Colors.transparent,
                   child: CircleAvatar(
-                    backgroundImage:
-                        NetworkImage(widget.user['profile_image_url'] ?? ''),
+                    backgroundImage: NetworkImage(widget.user['avatar']
+                            .replaceFirst("normal", "400x400") ??
+                        ''),
                     radius: 30.0,
                   ),
                 ),
@@ -141,61 +142,56 @@ class _DisplayContainerXState extends State<DisplayContainerX> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12),
               child: StreamBuilder(
-                  stream: FirebaseFirestore.instance
-                      .collection('Checked_List')
-                      .doc(docID)
-                      .snapshots(),
-                  builder: (context, snapshot) {
-                    try {
-                      var userDocument = snapshot.data;
-                      result = userDocument!["status"];
-                      if (result == 'loading') {
-                        return const SizedBox(
-                            height: 25,
-                            width: 25,
-                            child: CircularProgressIndicator(
-                              color: Color(0xffC62368),
-                            ));
-                      } else {
-                        FirebaseFirestore.instance
-                            .collection('Checked_List')
-                            .doc(docID)
-                            .delete();
-                        return const SizedBox(
-                            height: 25,
-                            width: 25,
-                            child: CircularProgressIndicator(
-                              color: Color(0xffC62368),
-                            ));
-                      }
-                    } catch (e) {
-                      if (result == 'loading') {
-                        return const SizedBox(
-                            height: 25,
-                            width: 25,
-                            child: CircularProgressIndicator(
-                              color: Color(0xffC62368),
-                            ));
-                      } else if (result == 'true') {
-                        return SizedBox(
-                          height: 36,
-                          width: 36,
-                          child: Tab(
-                            icon: Image.asset('assets/Spy.png'),
-                          ),
-                        );
-                      } else {
-                        return const SizedBox(
-                          height: 36,
-                          width: 36,
-                          child: Icon(
-                            Icons.verified_user,
-                            color: CupertinoColors.activeGreen,
-                          ),
-                        );
-                      }
+                stream: FirebaseFirestore.instance
+                    .collection('Checked_List')
+                    .doc(docID)
+                    .snapshots(),
+                builder: (context, snapshot) {
+                  try {
+                    var userDocument = snapshot.data;
+                    result = userDocument!["status"];
+                    if (result == 0.0) {
+                      return const SizedBox(
+                          height: 25,
+                          width: 25,
+                          child: CircularProgressIndicator(
+                            color: Color(0xffC62368),
+                          ));
+                    } else {
+                      FirebaseFirestore.instance
+                          .collection('Checked_List')
+                          .doc(docID)
+                          .delete();
+                      return const SizedBox(
+                          height: 25,
+                          width: 25,
+                          child: CircularProgressIndicator(
+                            color: Color(0xffC62368),
+                          ));
                     }
-                  }),
+                  } catch (e) {
+                    if (result == 0.0) {
+                      return const SizedBox(
+                          height: 25,
+                          width: 25,
+                          child: CircularProgressIndicator(
+                            color: Color(0xffC62368),
+                          ));
+                    } else {
+                      return Text(
+                        "${((1 - result) * 100).ceil()}%",
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: result > 0.4
+                              ? CupertinoColors.activeGreen
+                              : CupertinoColors.systemRed,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      );
+                    }
+                  }
+                },
+              ),
             )
           ],
         ),
