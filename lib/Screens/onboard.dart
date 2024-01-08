@@ -22,7 +22,7 @@ class OnboardSreen extends StatelessWidget {
                   height: 60,
                 ),
                 const Text(
-                  'Im-persona',
+                  'Im-Persona',
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 36,
