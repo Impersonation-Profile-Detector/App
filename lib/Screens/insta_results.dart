@@ -65,6 +65,7 @@ class InstaResultsPageState extends State<InstaResultsPage> {
                 setState(() {
                   jsonData = users;
                 });
+                
               }
             }
           }

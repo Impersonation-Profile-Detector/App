@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:impersonation_detector/Screens/camera.dart';
 import 'package:impersonation_detector/screens/insta_results.dart';
 import 'package:impersonation_detector/screens/x_results.dart';
@@ -8,6 +9,7 @@ import 'package:avatar_glow/avatar_glow.dart';
 import 'package:images_picker/images_picker.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -106,33 +108,49 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  Future<void> requestPermission() async {
-    const cameraPermission = Permission.camera;
-    const externalPermission = Permission.manageExternalStorage;
-    const photosPermission = Permission.photos;
-    const mediaPermission = Permission.mediaLibrary;
-    const writePermission = Permission.storage;
+  // Future<void> requestPermission() async {
+  //   const cameraPermission = Permission.camera;
+  //   const photosPermission = Permission.photos;
+  //   const mediaPermission = Permission.mediaLibrary;
 
-    if (await cameraPermission.isDenied) {
-      await cameraPermission.request();
+  //   if (await cameraPermission.isDenied) {
+  //     await cameraPermission.request();
+  //   }
+  //   if (await photosPermission.isDenied) {
+  //     await photosPermission.request();
+  //   }
+  //   if (await mediaPermission.isDenied) {
+  //     await mediaPermission.request();
+  //   }
+  // }
+  Future<bool> storagePermission() async {
+    final DeviceInfoPlugin info = DeviceInfoPlugin();
+    final AndroidDeviceInfo androidInfo = await info.androidInfo;
+    final int androidVersion = int.parse(androidInfo.version.release);
+    bool havePermission = false;
+
+    if (androidVersion >= 13) {
+      final request = await [
+        Permission.videos,
+        Permission.photos,
+      ].request();
+
+      havePermission =
+          request.values.every((status) => status == PermissionStatus.granted);
+    } else {
+      final status = await Permission.storage.request();
+      havePermission = status.isGranted;
     }
-    if (await externalPermission.isDenied) {
-      await externalPermission.request();
+
+    if (!havePermission) {
+      await openAppSettings();
     }
-    if (await photosPermission.isDenied) {
-      await photosPermission.request();
-    }
-    if (await mediaPermission.isDenied) {
-      await mediaPermission.request();
-    }
-    if (await writePermission.isDenied) {
-      await writePermission.request();
-    }
+
+    return havePermission;
   }
 
   @override
   void initState() {
-    requestPermission();
     super.initState();
   }
 
@@ -165,7 +183,9 @@ class _HomePageState extends State<HomePage> {
                     height: 90,
                   ),
                   GestureDetector(
-                    onTap: () {
+                    onTap: () async {
+                      final permission = await storagePermission();
+                      if (!mounted) return;
                       showDialog(
                           context: context,
                           barrierDismissible: false,
@@ -183,9 +203,19 @@ class _HomePageState extends State<HomePage> {
                               actions: <Widget>[
                                 TextButton(
                                   child: const Text('Gallery'),
-                                  onPressed: () {
+                                  onPressed: () async {
                                     Navigator.of(context).pop();
-                                    getImageGallery();
+                                    final DeviceInfoPlugin info =
+                                        DeviceInfoPlugin();
+                                    final AndroidDeviceInfo androidInfo =
+                                        await info.androidInfo;
+                                    final int androidVersion =
+                                        int.parse(androidInfo.version.release);
+                                    if (androidVersion >= 13) {
+                                      _getFromCamera();
+                                    } else {
+                                      getImageGallery();
+                                    }
                                   },
                                 ),
                                 TextButton(
@@ -349,6 +379,7 @@ class _HomePageState extends State<HomePage> {
                           ),
                         ),
                       ),
+                      // IconButton(onPressed: (){}, icon: Icons.ac_unit_rounded)
                     ],
                   ),
                   const SizedBox(
@@ -432,5 +463,22 @@ class _HomePageState extends State<HomePage> {
       _selectedImage = File(compressedFile.path);
     }
     compressImage();
+  }
+
+  Future _getFromCamera() async {
+    final returnedImage =
+        await ImagePicker().pickImage(source: ImageSource.gallery);
+    if (returnedImage == null) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('We are facing some issue.Try again later'),
+        ),
+      );
+      return;
+    }
+    setState(() {
+      _selectedImage = File(returnedImage.path);
+    });
   }
 }
