@@ -1,21 +1,13 @@
 import 'package:avatar_glow/avatar_glow.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:uuid/uuid.dart';
-
-var uuid = const Uuid();
 
 class DisplayContainerX extends StatefulWidget {
   final dynamic user;
-  final String name;
-  final String imgUrl;
+  final double status;
+  final String id;
   const DisplayContainerX(
-      {super.key,
-      required this.user,
-      required this.name,
-      required this.imgUrl});
+      {super.key, this.user, required this.status, required this.id});
 
   @override
   State<DisplayContainerX> createState() => _DisplayContainerXState();
@@ -23,46 +15,12 @@ class DisplayContainerX extends StatefulWidget {
 
 class _DisplayContainerXState extends State<DisplayContainerX> {
   @override
+  void dispose() {
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    String docID = uuid.v1();
-    double result = 0.0;
-
-    Future uploadDetails({
-      required String name,
-      required String imgurl,
-      required String requesturl,
-    }) async {
-      final requestDetails =
-          FirebaseFirestore.instance.collection('Request_Details').doc(docID);
-      final json = {
-        'Name': name,
-        'User_Image': imgurl,
-        'Request_Image': requesturl,
-      };
-      await requestDetails.set(json);
-    }
-
-    void submitRequest() async {
-      try {
-        uploadDetails(
-          name: widget.name,
-          imgurl: widget.imgUrl,
-          requesturl: widget.user['avatar'].replaceFirst("normal", "400x400"),
-        );
-      } catch (e) {
-        ScaffoldMessenger.of(context).clearSnackBars();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              e.toString(),
-            ),
-          ),
-        );
-      }
-    }
-
-    submitRequest();
-
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 20),
       child: Container(
@@ -113,7 +71,7 @@ class _DisplayContainerXState extends State<DisplayContainerX> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      widget.user['screen_name'] ?? 'N/A',
+                      widget.user['name'] ?? 'N/A',
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w400,
@@ -141,56 +99,13 @@ class _DisplayContainerXState extends State<DisplayContainerX> {
             ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12),
-              child: StreamBuilder(
-                stream: FirebaseFirestore.instance
-                    .collection('Checked_List')
-                    .doc(docID)
-                    .snapshots(),
-                builder: (context, snapshot) {
-                  try {
-                    var userDocument = snapshot.data;
-                    result = userDocument!["status"];
-                    if (result == 0.0) {
-                      return const SizedBox(
-                          height: 25,
-                          width: 25,
-                          child: CircularProgressIndicator(
-                            color: Color(0xffC62368),
-                          ));
-                    } else {
-                      FirebaseFirestore.instance
-                          .collection('Checked_List')
-                          .doc(docID)
-                          .delete();
-                      return const SizedBox(
-                          height: 25,
-                          width: 25,
-                          child: CircularProgressIndicator(
-                            color: Color(0xffC62368),
-                          ));
-                    }
-                  } catch (e) {
-                    if (result == 0.0) {
-                      return const SizedBox(
-                          height: 25,
-                          width: 25,
-                          child: CircularProgressIndicator(
-                            color: Color(0xffC62368),
-                          ));
-                    } else {
-                      return Text(
-                        "${((1 - result) * 100).ceil()}%",
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: result > 0.4
-                              ? CupertinoColors.activeGreen
-                              : CupertinoColors.systemRed,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      );
-                    }
-                  }
-                },
+              child: Text(
+                "${((1 - widget.status) * 100).ceil()}%",
+                style: const TextStyle(
+                  fontSize: 16,
+                  color: Colors.red,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             )
           ],

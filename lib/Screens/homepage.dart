@@ -108,21 +108,6 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  // Future<void> requestPermission() async {
-  //   const cameraPermission = Permission.camera;
-  //   const photosPermission = Permission.photos;
-  //   const mediaPermission = Permission.mediaLibrary;
-
-  //   if (await cameraPermission.isDenied) {
-  //     await cameraPermission.request();
-  //   }
-  //   if (await photosPermission.isDenied) {
-  //     await photosPermission.request();
-  //   }
-  //   if (await mediaPermission.isDenied) {
-  //     await mediaPermission.request();
-  //   }
-  // }
   Future<bool> storagePermission() async {
     final DeviceInfoPlugin info = DeviceInfoPlugin();
     final AndroidDeviceInfo androidInfo = await info.androidInfo;

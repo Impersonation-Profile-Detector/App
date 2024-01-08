@@ -1,7 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:impersonation_detector/widgets/display_X.dart';
+import 'package:impersonation_detector/Widgets/display_x.dart';
+import 'package:uuid/uuid.dart';
 
 class XResultsPage extends StatefulWidget {
   final String imgUrl;
@@ -16,11 +18,64 @@ class XResultsPage extends StatefulWidget {
 
 class XResultsPageState extends State<XResultsPage> {
   List<dynamic> jsonData = [];
-  int currentPage = 1;
+  List<String> idList = [];
+  bool delay = true;
+
   @override
   void initState() {
     super.initState();
+    delayFunction();
     fetchData();
+  }
+
+  Future uploadDetails({
+    required String name,
+    required String imgurl,
+    required String reqUrl,
+    required dynamic user,
+    required String docID,
+  }) async {
+    final requestDetails =
+        FirebaseFirestore.instance.collection('Request_Details').doc(docID);
+    final json = {
+      'Name': name,
+      'User_Image': imgurl,
+      'Req_Image': reqUrl,
+      'UserData': user
+    };
+    await requestDetails.set(json);
+  }
+
+  void delayFunction() {
+    Future.delayed(const Duration(seconds: 45), () {
+      setState(() {
+        delay = false;
+      });
+    });
+  }
+
+  Future<void> submitRequest(dynamic user) async {
+    var uuid = const Uuid();
+    String docD = uuid.v1();
+    try {
+      uploadDetails(
+        name: widget.username,
+        imgurl: widget.imgUrl,
+        reqUrl: user['avatar'].replaceFirst("normal", "400x400"),
+        user: user,
+        docID: docD,
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).clearSnackBars();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            e.toString(),
+          ),
+        ),
+      );
+    }
   }
 
   Future<void> fetchData() async {
@@ -55,6 +110,10 @@ class XResultsPageState extends State<XResultsPage> {
             setState(() {
               jsonData = users;
             });
+         
+            for (int i = 0; i < jsonData.length; i++) {
+              submitRequest(jsonData[i]);
+            }
           }
         }
       } else {
@@ -81,6 +140,12 @@ class XResultsPageState extends State<XResultsPage> {
 
   @override
   void dispose() {
+    for (int i = 0; i < idList.length; i++) {
+      FirebaseFirestore.instance
+          .collection('Checked_List')
+          .doc(idList[i])
+          .delete();
+    }
     super.dispose();
   }
 
@@ -97,52 +162,48 @@ class XResultsPageState extends State<XResultsPage> {
         centerTitle: true,
       ),
       body: Container(
-        height: MediaQuery.of(context).size.height,
-        decoration: const BoxDecoration(
-          image: DecorationImage(
-              image: AssetImage('assets/waves1.png'), fit: BoxFit.cover),
-        ),
-        child: jsonData.isEmpty
-            ? const Center(
-                child: SizedBox(
-                    height: 125,
-                    width: 125,
-                    child: CircularProgressIndicator(
-                      color: Color(0xffffffff),
-                    )))
-            : Column(children: [
-                Expanded(
-                  child: ListView.builder(
-                      physics: const BouncingScrollPhysics(),
-                      //!explicitly deifined length
-                      itemCount: 5,
-                      itemBuilder: (context, index) {
-                        final actualIndex = (currentPage - 1) * 5 + index;
-                        if (actualIndex < jsonData.length) {
-                          final user = jsonData[actualIndex];
+          height: MediaQuery.of(context).size.height,
+          decoration: const BoxDecoration(
+            image: DecorationImage(
+                image: AssetImage('assets/waves1.png'), fit: BoxFit.cover),
+          ),
+          child: delay
+              ? const Center(
+                  child: SizedBox(
+                      height: 125,
+                      width: 125,
+                      child: CircularProgressIndicator(
+                        color: Color(0xffffffff),
+                      )))
+              : StreamBuilder(
+                  stream: FirebaseFirestore.instance
+                      .collection('Checked_List')
+                      .snapshots(),
+                  builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const CircularProgressIndicator();
+                    } else if (!snapshot.hasData) {
+                      return const CircularProgressIndicator();
+                    } else if (snapshot.hasError) {
+                      return Text('Error: ${snapshot.error}');
+                    } else {
+                      List<DocumentSnapshot> documents = snapshot.data!.docs;
+                      return ListView.builder(
+                        itemCount: documents.length,
+                        itemBuilder: (context, index) {
+                          var data =
+                              documents[index].data() as Map<String, dynamic>;
+                          idList.add(documents[index].id);
                           return DisplayContainerX(
-                            name: widget.username,
-                            imgUrl: widget.imgUrl,
-                            user: user,
+                            status: data['Status'],
+                            user: data['UserData'],
+                            id: documents[index].id,
                           );
-                        } else {
-                          return Container();
-                        }
-                      }),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 20),
-                  child: ElevatedButton(
-                    onPressed: () {
-                      setState(() {
-                        currentPage++;
-                      });
-                    },
-                    child: const Text('Next Page'),
-                  ),
-                )
-              ]),
-      ),
+                        },
+                      );
+                    }
+                  },
+                )),
     );
   }
 }

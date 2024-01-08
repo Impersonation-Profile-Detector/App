@@ -1,7 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:impersonation_detector/Widgets/display_insta.dart';
+import 'package:uuid/uuid.dart';
 
 class InstaResultsPage extends StatefulWidget {
   final String username;
@@ -17,11 +19,64 @@ class InstaResultsPage extends StatefulWidget {
 
 class InstaResultsPageState extends State<InstaResultsPage> {
   List<dynamic> jsonData = [];
-  int currentPage = 1;
-  @override
-  void initState() {
-    super.initState();
-    fetchData();
+  List<String> idList = [];
+  bool delay = true;
+
+  Future<bool> isCollectionEmpty(String collectionPath) async {
+    QuerySnapshot<Map<String, dynamic>> collection =
+        await FirebaseFirestore.instance.collection(collectionPath).get();
+
+    return collection.docs.isEmpty;
+  }
+
+  Future uploadDetails({
+    required String name,
+    required String imgurl,
+    required String reqUrl,
+    required dynamic user,
+    required String docID,
+  }) async {
+    final requestDetails =
+        FirebaseFirestore.instance.collection('Request_Details').doc(docID);
+    final json = {
+      'Name': name,
+      'User_Image': imgurl,
+      'Req_Image': reqUrl,
+      'UserData': user
+    };
+    await requestDetails.set(json);
+  }
+
+  Future<void> submitRequest(dynamic user) async {
+    var uuid = const Uuid();
+    String docD = uuid.v1();
+    try {
+      uploadDetails(
+        name: widget.username,
+        imgurl: widget.imgUrl,
+        reqUrl: user['profile_pic_url'],
+        user: user,
+        docID: docD,
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).clearSnackBars();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            e.toString(),
+          ),
+        ),
+      );
+    }
+  }
+
+  void delayFunction() {
+    Future.delayed(const Duration(seconds: 45), () {
+      setState(() {
+        delay = false;
+      });
+    });
   }
 
   Future<void> fetchData() async {
@@ -30,7 +85,7 @@ class InstaResultsPageState extends State<InstaResultsPage> {
         'https://rocketapi-for-instagram.p.rapidapi.com/instagram/search';
     final headers = {
       'content-type': 'application/json',
-      'X-RapidAPI-Key': '8db0e54e94msh98b37a582a2adefp182a93jsnf53067009cea',
+      'X-RapidAPI-Key': 'e33db81bf2msh8b2a2c7b8cf5363p1c7fbbjsn2617a896ce97',
       'X-RapidAPI-Host': 'rocketapi-for-instagram.p.rapidapi.com',
     };
 
@@ -65,7 +120,9 @@ class InstaResultsPageState extends State<InstaResultsPage> {
                 setState(() {
                   jsonData = users;
                 });
-                
+                for (int i = 0; i < jsonData.length; i++) {
+                  submitRequest(jsonData[i]['user']);
+                }
               }
             }
           }
@@ -93,7 +150,20 @@ class InstaResultsPageState extends State<InstaResultsPage> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    delayFunction();
+    fetchData();
+  }
+
+  @override
   void dispose() {
+    for (int i = 0; i < idList.length; i++) {
+      FirebaseFirestore.instance
+          .collection('Checked_List')
+          .doc(idList[i])
+          .delete();
+    }
     super.dispose();
   }
 
@@ -110,53 +180,47 @@ class InstaResultsPageState extends State<InstaResultsPage> {
         centerTitle: true,
       ),
       body: Container(
-        height: MediaQuery.of(context).size.height,
-        decoration: const BoxDecoration(
-          image: DecorationImage(
-              image: AssetImage('assets/waves1.png'), fit: BoxFit.cover),
-        ),
-        child: jsonData.isEmpty
-            ? const Center(
-                child: SizedBox(
-                    height: 125,
-                    width: 125,
-                    child: CircularProgressIndicator(
-                      color: Color(0xffffffff),
-                    )))
-            : Column(children: [
-                Expanded(
-                  child: ListView.builder(
-                    physics: const BouncingScrollPhysics(),
-                    //! length defined explicitly
-                    itemCount: 5,
-                    itemBuilder: (context, index) {
-                      final actualIndex = (currentPage - 1) * 5 + index;
-                      if (actualIndex < jsonData.length) {
-                        final user = jsonData[actualIndex]['user'];
-                        return DisplayContainerInsta(
-                          user: user,
-                          name: widget.username,
-                          imgUrl: widget.imgUrl,
-                        );
-                      } else {
-                        return Container();
-                      }
-                    },
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 20),
-                  child: ElevatedButton(
-                    onPressed: () {
-                      setState(() {
-                        currentPage++;
-                      });
-                    },
-                    child: const Text('Next Page'),
-                  ),
-                )
-              ]),
-      ),
+          height: MediaQuery.of(context).size.height,
+          decoration: const BoxDecoration(
+            image: DecorationImage(
+                image: AssetImage('assets/waves1.png'), fit: BoxFit.cover),
+          ),
+          child: (delay)
+              ? const Center(
+                  child: SizedBox(
+                      height: 125,
+                      width: 125,
+                      child: CircularProgressIndicator(
+                        color: Color(0xffffffff),
+                      )))
+              : StreamBuilder(
+                  stream: FirebaseFirestore.instance
+                      .collection('Checked_List')
+                      .snapshots(),
+                  builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const CircularProgressIndicator();
+                    } else if (!snapshot.hasData) {
+                      return const CircularProgressIndicator();
+                    } else if (snapshot.hasError) {
+                      return Text('Error: ${snapshot.error}');
+                    } else {
+                      List<DocumentSnapshot> documents = snapshot.data!.docs;
+                      return ListView.builder(
+                        itemCount: documents.length,
+                        itemBuilder: (context, index) {
+                          var data =
+                              documents[index].data() as Map<String, dynamic>;
+                          idList.add(documents[index].id);
+                          return DisplayContainerInsta(
+                              status: data['Status'],
+                              user: data['UserData'],
+                              id: documents[index].id);
+                        },
+                      );
+                    }
+                  },
+                )),
     );
   }
 }

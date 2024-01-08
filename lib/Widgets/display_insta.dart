@@ -1,20 +1,15 @@
-import 'dart:ffi';
-
 import 'package:avatar_glow/avatar_glow.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:uuid/uuid.dart';
 import 'package:url_launcher/url_launcher.dart';
-
-var uuid = const Uuid();
 
 class DisplayContainerInsta extends StatefulWidget {
   final dynamic user;
-  final String name;
-  final String imgUrl;
+  final double status;
+  final String id;
   const DisplayContainerInsta(
-      {super.key, this.user, required this.name, required this.imgUrl});
+      {super.key, this.user, required this.status, required this.id});
 
   @override
   State<DisplayContainerInsta> createState() => _DisplayContainerInstaState();
@@ -22,45 +17,12 @@ class DisplayContainerInsta extends StatefulWidget {
 
 class _DisplayContainerInstaState extends State<DisplayContainerInsta> {
   @override
+  void dispose() {
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    String docID = uuid.v1();
-    double result = 0.0;
-
-    Future uploadDetails({
-      required String name,
-      required String imgurl,
-      required String requesturl,
-    }) async {
-      final requestDetails =
-          FirebaseFirestore.instance.collection('Request_Details').doc(docID);
-      final json = {
-        'Name': name,
-        'User_Image': imgurl,
-        'Request_Image': requesturl,
-      };
-      await requestDetails.set(json);
-    }
-
-    void submitRequest() async {
-      try {
-        uploadDetails(
-          name: widget.name,
-          imgurl: widget.imgUrl,
-          requesturl: widget.user['profile_pic_url'],
-        );
-      } catch (e) {
-        ScaffoldMessenger.of(context).clearSnackBars();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              e.toString(),
-            ),
-          ),
-        );
-      }
-    }
-
-    submitRequest();
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 20),
       child: Container(
@@ -137,84 +99,13 @@ class _DisplayContainerInstaState extends State<DisplayContainerInsta> {
             ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12),
-              child: StreamBuilder(
-                stream: FirebaseFirestore.instance
-                    .collection('Checked_List')
-                    .doc(docID)
-                    .snapshots(),
-                builder: (context, snapshot) {
-                  try {
-                    var userDocument = snapshot.data;
-                    result = userDocument!["status"];
-                    if (result == 0.0) {
-                      return const SizedBox(
-                          height: 25,
-                          width: 25,
-                          child: CircularProgressIndicator(
-                            color: Color(0xffC62368),
-                          ));
-                    } else {
-                      FirebaseFirestore.instance
-                          .collection('Checked_List')
-                          .doc(docID)
-                          .delete();
-                      return const SizedBox(
-                          height: 25,
-                          width: 25,
-                          child: CircularProgressIndicator(
-                            color: Color(0xffC62368),
-                          ));
-                    }
-                  } catch (e) {
-                    if (result == 0.0) {
-                      return const SizedBox(
-                          height: 25,
-                          width: 25,
-                          child: CircularProgressIndicator(
-                            color: Color(0xffC62368),
-                          ));
-                    } else {
-                      return Text(
-                        "${((1 - result) * 100).ceil()}%",
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: result > 0.4
-                              ? CupertinoColors.activeGreen
-                              : CupertinoColors.systemRed,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      );
-                    }
-                    //  else if (result <= 0.4) {
-                    //   return SizedBox(
-                    //     height: 36,
-                    //     width: 80,
-                    //     child: Row(
-                    //       children: [
-                    //         Tab(
-                    //           icon: Image.asset('assets/Spy.png'),
-                    //         ),
-                    //         Text("${((1 - result)*100).ceil()}%")
-                    //       ],
-                    //     ),
-                    //   );
-                    // } else {
-                    //   return SizedBox(
-                    //     height: 36,
-                    //     width: 60,
-                    //     child: Row(
-                    //       children: [
-                    //         const Icon(
-                    //           Icons.verified_user,
-                    //           color: CupertinoColors.activeGreen,
-                    //         ),
-                    //         Text("${((1 - result) * 100).ceil()}%")
-                    //       ],
-                    //     ),
-                    //   );
-                    // }
-                  }
-                },
+              child: Text(
+                "${((1 - widget.status) * 100).ceil()}%",
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.red,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             )
           ],
