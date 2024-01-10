@@ -71,14 +71,6 @@ class InstaResultsPageState extends State<InstaResultsPage> {
     }
   }
 
-  void delayFunction() {
-    Future.delayed(const Duration(seconds: 45), () {
-      setState(() {
-        delay = false;
-      });
-    });
-  }
-
   Future<void> fetchData() async {
     // API endpoint and headers
     const url =
@@ -152,75 +144,134 @@ class InstaResultsPageState extends State<InstaResultsPage> {
   @override
   void initState() {
     super.initState();
-    delayFunction();
     fetchData();
   }
 
   @override
   void dispose() {
-    for (int i = 0; i < idList.length; i++) {
-      FirebaseFirestore.instance
-          .collection('Checked_List')
-          .doc(idList[i])
-          .delete();
-    }
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        iconTheme: const IconThemeData(color: Colors.white),
-        backgroundColor: const Color(0xff001220),
-        title: const Text(
-          'Instagram Results',
-          style: TextStyle(color: Colors.white),
+    return PopScope(
+      onPopInvoked: (didPop) {
+        for (int i = 0; i < idList.length; i++) {
+          FirebaseFirestore.instance
+              .collection('Checked_List')
+              .doc(idList[i])
+              .delete();
+        }
+      },
+      canPop: true,
+      child: Scaffold(
+        appBar: AppBar(
+          iconTheme: const IconThemeData(color: Colors.white),
+          backgroundColor: const Color(0xff001220),
+          title: const Text(
+            'Instagram Results',
+            style: TextStyle(color: Colors.white),
+          ),
+          centerTitle: true,
         ),
-        centerTitle: true,
-      ),
-      body: Container(
+        body: Container(
           height: MediaQuery.of(context).size.height,
           decoration: const BoxDecoration(
             image: DecorationImage(
                 image: AssetImage('assets/waves1.png'), fit: BoxFit.cover),
           ),
-          child: (delay)
-              ? const Center(
+          child: StreamBuilder(
+            stream: FirebaseFirestore.instance
+                .collection('Request_Details')
+                .snapshots(),
+            builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(
                   child: SizedBox(
+                    height: 125,
+                    width: 125,
+                    child: CircularProgressIndicator(
+                      color: Color(0xffffffff),
+                    ),
+                  ),
+                );
+              } else if (!snapshot.hasData) {
+                return const Center(
+                  child: SizedBox(
+                    height: 125,
+                    width: 125,
+                    child: CircularProgressIndicator(
+                      color: Color(0xffffffff),
+                    ),
+                  ),
+                );
+              } else if (snapshot.hasError) {
+                return Text('Error: ${snapshot.error}');
+              } else {
+                List<DocumentSnapshot> documents = snapshot.data!.docs;
+                if (documents.isEmpty) {
+                  return StreamBuilder(
+                    stream: FirebaseFirestore.instance
+                        .collection('Checked_List')
+                        .snapshots(),
+                    builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const CircularProgressIndicator();
+                      } else if (!snapshot.hasData) {
+                        return const Center(
+                          child: SizedBox(
+                            height: 125,
+                            width: 125,
+                            child: CircularProgressIndicator(
+                              color: Color(0xffffffff),
+                            ),
+                          ),
+                        );
+                      } else if (snapshot.hasError) {
+                        return Text('Error: ${snapshot.error}');
+                      } else {
+                        List<DocumentSnapshot> documents = snapshot.data!.docs;
+                        if (documents.isEmpty) {
+                          return const Center(
+                            child: Text(
+                              "No matches found ",
+                              style:
+                                  TextStyle(color: Colors.white, fontSize: 20),
+                            ),
+                          );
+                        } else {
+                          return ListView.builder(
+                            itemCount: documents.length,
+                            itemBuilder: (context, index) {
+                              var data = documents[index].data()
+                                  as Map<String, dynamic>;
+                              idList.add(documents[index].id);
+                              return DisplayContainerInsta(
+                                  status: data['Status'],
+                                  user: data['UserData'],
+                                  id: documents[index].id);
+                            },
+                          );
+                        }
+                      }
+                    },
+                  );
+                } else {
+                  return const Center(
+                    child: SizedBox(
                       height: 125,
                       width: 125,
                       child: CircularProgressIndicator(
                         color: Color(0xffffffff),
-                      )))
-              : StreamBuilder(
-                  stream: FirebaseFirestore.instance
-                      .collection('Checked_List')
-                      .snapshots(),
-                  builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const CircularProgressIndicator();
-                    } else if (!snapshot.hasData) {
-                      return const CircularProgressIndicator();
-                    } else if (snapshot.hasError) {
-                      return Text('Error: ${snapshot.error}');
-                    } else {
-                      List<DocumentSnapshot> documents = snapshot.data!.docs;
-                      return ListView.builder(
-                        itemCount: documents.length,
-                        itemBuilder: (context, index) {
-                          var data =
-                              documents[index].data() as Map<String, dynamic>;
-                          idList.add(documents[index].id);
-                          return DisplayContainerInsta(
-                              status: data['Status'],
-                              user: data['UserData'],
-                              id: documents[index].id);
-                        },
-                      );
-                    }
-                  },
-                )),
+                      ),
+                    ),
+                  );
+                }
+              }
+            },
+          ),
+        ),
+      ),
     );
   }
 }
