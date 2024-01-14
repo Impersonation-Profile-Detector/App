@@ -2,9 +2,10 @@ import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:impersonation_detector/Screens/camera.dart';
-import 'package:impersonation_detector/screens/insta_results.dart';
-import 'package:impersonation_detector/screens/x_results.dart';
+import 'package:impersonation_detector/Screens/Facebook/facebook_results.dart';
+import 'package:impersonation_detector/Services/camera.dart';
+import 'package:impersonation_detector/screens/Insta/insta_results.dart';
+import 'package:impersonation_detector/screens/X/x_results.dart';
 import 'package:avatar_glow/avatar_glow.dart';
 import 'package:images_picker/images_picker.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
@@ -364,7 +365,44 @@ class _HomePageState extends State<HomePage> {
                           ),
                         ),
                       ),
-                      // IconButton(onPressed: (){}, icon: Icons.ac_unit_rounded)
+                      // GestureDetector(
+                      //   onTap: () {
+                      //     FocusManager.instance.primaryFocus?.unfocus();
+                      //     Navigator.of(context).pushReplacement(
+                      //       MaterialPageRoute(
+                      //         builder: (context) => FacebookScraper(),
+                      //       ),
+                      //     );
+                      //   },
+                      //   child: Container(
+                      //     height: 150,
+                      //     width: 50,
+                      //     decoration: isX
+                      //         ? BoxDecoration(
+                      //             borderRadius: BorderRadius.circular(15),
+                      //             border:
+                      //                 Border.all(color: Colors.white, width: 2),
+                      //           )
+                      //         : const BoxDecoration(),
+                      //     child: Column(
+                      //       children: [
+                      //         Tab(
+                      //           icon: Image.asset(
+                      //             "assets/Spy.png",
+                      //             color: Colors.black,
+                      //           ),
+                      //           height: 120,
+                      //         ),
+                      //         const Text(
+                      //           'Meta',
+                      //           style: TextStyle(
+                      //               color: Colors.white,
+                      //               fontWeight: FontWeight.bold),
+                      //         )
+                      //       ],
+                      //     ),
+                      //   ),
+                      // ),
                     ],
                   ),
                   const SizedBox(
