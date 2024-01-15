@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:impersonation_detector/Widgets/display_insta.dart';
+import 'package:impersonation_detector/Widgets/loading.dart';
 import 'package:uuid/uuid.dart';
 
 class InstaResultsPage extends StatefulWidget {
@@ -69,6 +70,13 @@ class InstaResultsPageState extends State<InstaResultsPage> {
         ),
       );
     }
+  }
+
+  Future<void> delayFunction(Duration duration) async {
+    await Future.delayed(duration);
+    setState(() {
+      delay = false;
+    });
   }
 
   Future<void> fetchData() async {
@@ -144,6 +152,7 @@ class InstaResultsPageState extends State<InstaResultsPage> {
   @override
   void initState() {
     super.initState();
+    delayFunction(const Duration(seconds: 60));
     fetchData();
   }
 
@@ -155,12 +164,11 @@ class InstaResultsPageState extends State<InstaResultsPage> {
   @override
   Widget build(BuildContext context) {
     return PopScope(
-      onPopInvoked: (didPop) {
-        for (int i = 0; i < idList.length; i++) {
-          FirebaseFirestore.instance
-              .collection('Checked_List')
-              .doc(idList[i])
-              .delete();
+      onPopInvoked: (didPop) async {
+        var collection = FirebaseFirestore.instance.collection(widget.username);
+        var snapshots = await collection.get();
+        for (var doc in snapshots.docs) {
+          await doc.reference.delete();
         }
       },
       canPop: true,
@@ -180,96 +188,43 @@ class InstaResultsPageState extends State<InstaResultsPage> {
             image: DecorationImage(
                 image: AssetImage('assets/waves1.png'), fit: BoxFit.cover),
           ),
-          child: StreamBuilder(
-            stream: FirebaseFirestore.instance
-                .collection('Request_Details')
-                .snapshots(),
-            builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(
-                  child: SizedBox(
-                    height: 125,
-                    width: 125,
-                    child: CircularProgressIndicator(
-                      color: Color(0xffffffff),
-                    ),
-                  ),
-                );
-              } else if (!snapshot.hasData) {
-                return const Center(
-                  child: SizedBox(
-                    height: 125,
-                    width: 125,
-                    child: CircularProgressIndicator(
-                      color: Color(0xffffffff),
-                    ),
-                  ),
-                );
-              } else if (snapshot.hasError) {
-                return Text('Error: ${snapshot.error}');
-              } else {
-                List<DocumentSnapshot> documents = snapshot.data!.docs;
-                if (documents.isEmpty) {
-                  return StreamBuilder(
-                    stream: FirebaseFirestore.instance
-                        .collection('Checked_List')
-                        .snapshots(),
-                    builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const CircularProgressIndicator();
-                      } else if (!snapshot.hasData) {
-                        return const Center(
-                          child: SizedBox(
-                            height: 125,
-                            width: 125,
-                            child: CircularProgressIndicator(
-                              color: Color(0xffffffff),
-                            ),
-                          ),
-                        );
-                      } else if (snapshot.hasError) {
-                        return Text('Error: ${snapshot.error}');
+          child: delay
+              ? const Center(
+                  child: Loading(),
+                )
+              : StreamBuilder(
+                  stream: FirebaseFirestore.instance
+                      .collection(widget.username)
+                      .snapshots(),
+                  builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const CircularProgressIndicator();
+                    } else if (!snapshot.hasData) {
+                      return const Center(child: Loading());
+                    } else if (snapshot.hasError) {
+                      return Text('Error: ${snapshot.error}');
+                    } else {
+                      List<DocumentSnapshot> documents = snapshot.data!.docs;
+                      if (documents.isEmpty) {
+                        return const Center(child: Loading());
                       } else {
-                        List<DocumentSnapshot> documents = snapshot.data!.docs;
-                        if (documents.isEmpty) {
-                          return const Center(
-                            child: Text(
-                              "No matches found ",
-                              style:
-                                  TextStyle(color: Colors.white, fontSize: 20),
-                            ),
-                          );
-                        } else {
-                          return ListView.builder(
-                            itemCount: documents.length,
-                            itemBuilder: (context, index) {
-                              var data = documents[index].data()
-                                  as Map<String, dynamic>;
-                              idList.add(documents[index].id);
-                              return DisplayContainerInsta(
-                                  status: data['Status'],
-                                  user: data['UserData'],
-                                  id: documents[index].id);
-                            },
-                          );
-                        }
+                        return ListView.builder(
+                          itemCount: documents.length,
+                          itemBuilder: (context, index) {
+                            
+                            var data =
+                                documents[index].data() as Map<String, dynamic>;
+                            idList.add(documents[index].id);
+                            return DisplayContainerInsta(
+                                status: data['Status'],
+                                user: data['UserData'],
+                                id: documents[index].id);
+                          },
+                        );
                       }
-                    },
-                  );
-                } else {
-                  return const Center(
-                    child: SizedBox(
-                      height: 125,
-                      width: 125,
-                      child: CircularProgressIndicator(
-                        color: Color(0xffffffff),
-                      ),
-                    ),
-                  );
-                }
-              }
-            },
-          ),
+                    }
+                  },
+                ),
         ),
       ),
     );

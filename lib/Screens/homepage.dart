@@ -166,7 +166,17 @@ class _HomePageState extends State<HomePage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const SizedBox(
-                    height: 90,
+                    height: 70,
+                  ),
+                  const Text(
+                    'Upload Image',
+                    style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(
+                    height: 15,
                   ),
                   GestureDetector(
                     onTap: () async {

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:impersonation_detector/Widgets/display_x.dart';
+import 'package:impersonation_detector/Widgets/loading.dart';
 import 'package:uuid/uuid.dart';
 
 class XResultsPage extends StatefulWidget {
@@ -24,7 +25,15 @@ class XResultsPageState extends State<XResultsPage> {
   @override
   void initState() {
     super.initState();
+    delayFunction(const Duration(seconds: 60));
     fetchData();
+  }
+
+  Future<void> delayFunction(Duration duration) async {
+    await Future.delayed(duration);
+    setState(() {
+      delay = false;
+    });
   }
 
   Future uploadDetails({
@@ -141,7 +150,7 @@ class XResultsPageState extends State<XResultsPage> {
       onPopInvoked: (didPop) {
         for (int i = 0; i < idList.length; i++) {
           FirebaseFirestore.instance
-              .collection('Checked_List')
+              .collection(widget.username)
               .doc(idList[i])
               .delete();
         }
@@ -157,102 +166,48 @@ class XResultsPageState extends State<XResultsPage> {
           centerTitle: true,
         ),
         body: Container(
-          height: MediaQuery.of(context).size.height,
-          decoration: const BoxDecoration(
-            image: DecorationImage(
-                image: AssetImage('assets/waves1.png'), fit: BoxFit.cover),
-          ),
-          child: StreamBuilder(
-            stream: FirebaseFirestore.instance
-                .collection('Request_Details')
-                .snapshots(),
-            builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(
-                  child: SizedBox(
-                    height: 125,
-                    width: 125,
-                    child: CircularProgressIndicator(
-                      color: Color(0xffffffff),
-                    ),
-                  ),
-                );
-              } else if (!snapshot.hasData) {
-                return const Center(
-                  child: SizedBox(
-                    height: 125,
-                    width: 125,
-                    child: CircularProgressIndicator(
-                      color: Color(0xffffffff),
-                    ),
-                  ),
-                );
-              } else if (snapshot.hasError) {
-                return Text('Error: ${snapshot.error}');
-              } else {
-                List<DocumentSnapshot> documents = snapshot.data!.docs;
-                if (documents.isEmpty) {
-                  return StreamBuilder(
-                    stream: FirebaseFirestore.instance
-                        .collection('Checked_List')
-                        .snapshots(),
-                    builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const CircularProgressIndicator();
-                      } else if (!snapshot.hasData) {
-                        return const Center(
-                          child: SizedBox(
-                            height: 125,
-                            width: 125,
-                            child: CircularProgressIndicator(
-                              color: Color(0xffffffff),
-                            ),
-                          ),
-                        );
-                      } else if (snapshot.hasError) {
-                        return Text('Error: ${snapshot.error}');
-                      } else {
-                        List<DocumentSnapshot> documents = snapshot.data!.docs;
-                        if (documents.isEmpty) {
-                          return const Center(
-                            child: Text(
-                              "No matches found ",
-                              style:
-                                  TextStyle(color: Colors.white, fontSize: 20),
-                            ),
-                          );
-                        } else {
-                          return ListView.builder(
-                            itemCount: documents.length,
-                            itemBuilder: (context, index) {
-                              var data = documents[index].data()
-                                  as Map<String, dynamic>;
-                              idList.add(documents[index].id);
-                              return DisplayContainerX(
-                                  status: data['Status'],
-                                  user: data['UserData'],
-                                  id: documents[index].id);
-                            },
-                          );
-                        }
-                      }
-                    },
-                  );
+            height: MediaQuery.of(context).size.height,
+            decoration: const BoxDecoration(
+              image: DecorationImage(
+                  image: AssetImage('assets/waves1.png'), fit: BoxFit.cover),
+            ),
+            child: StreamBuilder(
+              stream: FirebaseFirestore.instance
+                  .collection(widget.username)
+                  .snapshots(),
+              builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const CircularProgressIndicator();
+                } else if (!snapshot.hasData) {
+                  return const Center(child: Loading());
+                } else if (snapshot.hasError) {
+                  return Text('Error: ${snapshot.error}');
                 } else {
-                  return const Center(
-                    child: SizedBox(
-                      height: 125,
-                      width: 125,
-                      child: CircularProgressIndicator(
-                        color: Color(0xffffffff),
+                  List<DocumentSnapshot> documents = snapshot.data!.docs;
+                  if (documents.isEmpty) {
+                    return const Center(
+                      child: Text(
+                        "No matches found ",
+                        style: TextStyle(color: Colors.white, fontSize: 20),
                       ),
-                    ),
-                  );
+                    );
+                  } else {
+                    return ListView.builder(
+                      itemCount: documents.length,
+                      itemBuilder: (context, index) {
+                        var data =
+                            documents[index].data() as Map<String, dynamic>;
+                        idList.add(documents[index].id);
+                        return DisplayContainerX(
+                            status: data['Status'],
+                            user: data['UserData'],
+                            id: documents[index].id);
+                      },
+                    );
+                  }
                 }
-              }
-            },
-          ),
-        ),
+              },
+            )),
       ),
     );
   }
