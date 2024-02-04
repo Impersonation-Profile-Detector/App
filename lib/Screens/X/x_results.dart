@@ -171,7 +171,11 @@ class XResultsPageState extends State<XResultsPage> {
               image: DecorationImage(
                   image: AssetImage('assets/waves1.png'), fit: BoxFit.cover),
             ),
-            child: StreamBuilder(
+            child: delay
+                ? const Center(
+                    child: Loading(),
+                  )
+                : StreamBuilder(
               stream: FirebaseFirestore.instance
                   .collection(widget.username)
                   .snapshots(),
