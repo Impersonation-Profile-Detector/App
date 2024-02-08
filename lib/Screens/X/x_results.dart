@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:impersonation_detector/Widgets/display_x.dart';
 import 'package:impersonation_detector/Widgets/loading.dart';
+import 'package:impersonation_detector/var.dart';
 import 'package:uuid/uuid.dart';
 
 class XResultsPage extends StatefulWidget {
@@ -25,7 +26,7 @@ class XResultsPageState extends State<XResultsPage> {
   @override
   void initState() {
     super.initState();
-    delayFunction(const Duration(seconds: 60));
+    delayFunction(const Duration(seconds: loadingDelay));
     fetchData();
   }
 
@@ -176,42 +177,43 @@ class XResultsPageState extends State<XResultsPage> {
                     child: Loading(),
                   )
                 : StreamBuilder(
-              stream: FirebaseFirestore.instance
-                  .collection(widget.username)
-                  .snapshots(),
-              builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const CircularProgressIndicator();
-                } else if (!snapshot.hasData) {
-                  return const Center(child: Loading());
-                } else if (snapshot.hasError) {
-                  return Text('Error: ${snapshot.error}');
-                } else {
-                  List<DocumentSnapshot> documents = snapshot.data!.docs;
-                  if (documents.isEmpty) {
-                    return const Center(
-                      child: Text(
-                        "No matches found ",
-                        style: TextStyle(color: Colors.white, fontSize: 20),
-                      ),
-                    );
-                  } else {
-                    return ListView.builder(
-                      itemCount: documents.length,
-                      itemBuilder: (context, index) {
-                        var data =
-                            documents[index].data() as Map<String, dynamic>;
-                        idList.add(documents[index].id);
-                        return DisplayContainerX(
-                            status: data['Status'],
-                            user: data['UserData'],
-                            id: documents[index].id);
-                      },
-                    );
-                  }
-                }
-              },
-            )),
+                    stream: FirebaseFirestore.instance
+                        .collection(widget.username)
+                        .snapshots(),
+                    builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const CircularProgressIndicator();
+                      } else if (!snapshot.hasData) {
+                        return const Center(child: Loading());
+                      } else if (snapshot.hasError) {
+                        return Text('Error: ${snapshot.error}');
+                      } else {
+                        List<DocumentSnapshot> documents = snapshot.data!.docs;
+                        if (documents.isEmpty) {
+                          return const Center(
+                            child: Text(
+                              "No matches found ",
+                              style:
+                                  TextStyle(color: Colors.white, fontSize: 20),
+                            ),
+                          );
+                        } else {
+                          return ListView.builder(
+                            itemCount: documents.length,
+                            itemBuilder: (context, index) {
+                              var data = documents[index].data()
+                                  as Map<String, dynamic>;
+                              idList.add(documents[index].id);
+                              return DisplayContainerX(
+                                  status: data['Status'],
+                                  user: data['UserData'],
+                                  id: documents[index].id);
+                            },
+                          );
+                        }
+                      }
+                    },
+                  )),
       ),
     );
   }

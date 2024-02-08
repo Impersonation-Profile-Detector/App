@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:impersonation_detector/Widgets/display_insta.dart';
 import 'package:impersonation_detector/Widgets/loading.dart';
+import 'package:impersonation_detector/var.dart';
 import 'package:uuid/uuid.dart';
 
 class InstaResultsPage extends StatefulWidget {
@@ -93,7 +94,6 @@ class InstaResultsPageState extends State<InstaResultsPage> {
     final body = {'query': widget.username};
 
     try {
-      // Perform the HTTP POST request
       final response = await http.post(
         Uri.parse(url),
         headers: headers,
@@ -101,11 +101,8 @@ class InstaResultsPageState extends State<InstaResultsPage> {
       );
 
       if (response.statusCode == 200) {
-        // Decode the JSON response
         final dynamic responseData = jsonDecode(response.body);
-        // print('Full JSON Response: $responseData');
 
-        // Check and extract information from the response
         if (responseData is Map && responseData.containsKey('response')) {
           final dynamic responseInfo = responseData['response'];
 
@@ -121,7 +118,9 @@ class InstaResultsPageState extends State<InstaResultsPage> {
                   jsonData = users;
                 });
                 for (int i = 0; i < jsonData.length; i++) {
-                  submitRequest(jsonData[i]['user']);
+                  if (i < 30) {
+                    submitRequest(jsonData[i]['user']);
+                  }
                 }
               }
             }
@@ -152,7 +151,7 @@ class InstaResultsPageState extends State<InstaResultsPage> {
   @override
   void initState() {
     super.initState();
-    delayFunction(const Duration(seconds: 60));
+    delayFunction(const Duration(seconds: loadingDelay));
     fetchData();
   }
 
@@ -206,12 +205,16 @@ class InstaResultsPageState extends State<InstaResultsPage> {
                     } else {
                       List<DocumentSnapshot> documents = snapshot.data!.docs;
                       if (documents.isEmpty) {
-                        return const Center(child: Loading());
+                        return const Center(
+                          child: Text(
+                            "No matches found ",
+                            style: TextStyle(color: Colors.white, fontSize: 20),
+                          ),
+                        );
                       } else {
                         return ListView.builder(
                           itemCount: documents.length,
                           itemBuilder: (context, index) {
-                            
                             var data =
                                 documents[index].data() as Map<String, dynamic>;
                             idList.add(documents[index].id);

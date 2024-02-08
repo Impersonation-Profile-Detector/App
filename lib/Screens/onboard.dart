@@ -22,7 +22,7 @@ class OnboardSreen extends StatelessWidget {
                   height: 60,
                 ),
                 const Text(
-                  'Im-Persona',
+                  'NER Profile',
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 36,
@@ -35,9 +35,16 @@ class OnboardSreen extends StatelessWidget {
                   height: 300,
                   width: 300,
                   decoration: BoxDecoration(
-                    color: Colors.white60,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
+                      color: Colors.white60,
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: const [
+                        BoxShadow(
+                          offset: Offset(4, 4),
+                          blurRadius: 4,
+                          color: Color.fromARGB(255, 37, 37, 37),
+                        )
+                      ],
+                      border: Border.all(color: Colors.white, width: 0.3)),
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(20),
                     child: Image.asset(
@@ -46,11 +53,12 @@ class OnboardSreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(
-                  height: 25,
+                  height: 40,
                 ),
                 const Text(
-                  'Im-persona is your trusty companion in online authenticity. The app employs advanced machine learning algorithms to seamlessly detect and weed out fake profiles across various social networks.',
-                  style: TextStyle(fontSize: 16, color: Colors.white),
+                  'A mobile app to check whether there are accounts impersonating a given social media account.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 18, color: Colors.white),
                 ),
                 const SizedBox(
                   height: 40,

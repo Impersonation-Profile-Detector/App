@@ -1,8 +1,9 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:impersonation_detector/Screens/Facebook/facebook_results.dart';
 import 'package:impersonation_detector/Services/camera.dart';
 import 'package:impersonation_detector/screens/Insta/insta_results.dart';
 import 'package:impersonation_detector/screens/X/x_results.dart';
@@ -180,6 +181,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                   GestureDetector(
                     onTap: () async {
+                      // ignore: unused_local_variable
                       final permission = await storagePermission();
                       if (!mounted) return;
                       showDialog(
@@ -187,7 +189,12 @@ class _HomePageState extends State<HomePage> {
                           barrierDismissible: false,
                           builder: (BuildContext context) {
                             return AlertDialog(
-                              title: const Text('Upload Image'),
+                              title: const Text(
+                                'Upload Image',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                ),
+                              ),
                               content: const SingleChildScrollView(
                                 child: ListBody(
                                   children: <Widget>[
@@ -253,12 +260,12 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
                   const SizedBox(
-                    height: 20,
+                    height: 30,
                   ),
                   const Text(
                     'Name',
                     style: TextStyle(
-                        fontSize: 14,
+                        fontSize: 16,
                         color: Colors.white,
                         fontWeight: FontWeight.bold),
                   ),
@@ -279,7 +286,7 @@ class _HomePageState extends State<HomePage> {
                           borderSide: const BorderSide(color: Colors.white),
                           borderRadius: BorderRadius.circular(10),
                         ),
-                        hintText: 'Enter your name here',
+                        hintText: 'Enter an username ... ',
                         alignLabelWithHint: true,
                         hintStyle: const TextStyle(
                             color: Color.fromARGB(202, 0, 0, 0)),
@@ -292,12 +299,12 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
                   const SizedBox(
-                    height: 20,
+                    height: 30,
                   ),
                   const Text(
                     'Select the SNS',
                     style: TextStyle(
-                        fontSize: 14,
+                        fontSize: 16,
                         color: Colors.white,
                         fontWeight: FontWeight.bold),
                   ),
@@ -375,48 +382,10 @@ class _HomePageState extends State<HomePage> {
                           ),
                         ),
                       ),
-                      // GestureDetector(
-                      //   onTap: () {
-                      //     FocusManager.instance.primaryFocus?.unfocus();
-                      //     Navigator.of(context).pushReplacement(
-                      //       MaterialPageRoute(
-                      //         builder: (context) => FacebookScraper(),
-                      //       ),
-                      //     );
-                      //   },
-                      //   child: Container(
-                      //     height: 150,
-                      //     width: 50,
-                      //     decoration: isX
-                      //         ? BoxDecoration(
-                      //             borderRadius: BorderRadius.circular(15),
-                      //             border:
-                      //                 Border.all(color: Colors.white, width: 2),
-                      //           )
-                      //         : const BoxDecoration(),
-                      //     child: Column(
-                      //       children: [
-                      //         Tab(
-                      //           icon: Image.asset(
-                      //             "assets/Spy.png",
-                      //             color: Colors.black,
-                      //           ),
-                      //           height: 120,
-                      //         ),
-                      //         const Text(
-                      //           'Meta',
-                      //           style: TextStyle(
-                      //               color: Colors.white,
-                      //               fontWeight: FontWeight.bold),
-                      //         )
-                      //       ],
-                      //     ),
-                      //   ),
-                      // ),
                     ],
                   ),
                   const SizedBox(
-                    height: 25,
+                    height: 40,
                   ),
                   SizedBox(
                     height: 40,
@@ -437,6 +406,28 @@ class _HomePageState extends State<HomePage> {
                           ),
                         ),
                         onPressed: () {
+                          if (_selectedImage == null) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Please select an image.'),
+                              ),
+                            );
+                            return;
+                          } else if (_controller.value.text == '') {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Please enter username.'),
+                              ),
+                            );
+                            return;
+                          } else if (isInsta == false && isX == false) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Please select SNS.'),
+                              ),
+                            );
+                            return;
+                          }
                           if (isInsta) {
                             submitInstaDetails();
                           } else if (isX) {
@@ -513,5 +504,35 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       _selectedImage = File(returnedImage.path);
     });
+  }
+
+  bool isValidate(TextEditingController controller, File selectedImage,
+      bool isInsta, bool isX) {
+    print("helloowo---------");
+    if (controller.value.text == '') {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please enter username.'),
+        ),
+      );
+      return true;
+    } else if (isInsta == false && isX == false) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please select SNS.'),
+        ),
+      );
+      return true;
+    }
+    // } else if ( selectedImage.exists()) {
+    //   ScaffoldMessenger.of(context).showSnackBar(
+    //     const SnackBar(
+    //       content: Text('Please upload an image.'),
+    //     ),
+    //   );
+    //   return true;
+    // }
+
+    return false;
   }
 }

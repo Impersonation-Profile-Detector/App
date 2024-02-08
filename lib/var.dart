@@ -1,0 +1,1 @@
+const loadingDelay = 60;
