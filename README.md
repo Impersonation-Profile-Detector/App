@@ -1,6 +1,6 @@
-# Im-persona
+# NER Profile
 
-Welcome to Im-persona! This Flutter application is designed to detect impersonation profiles across various Online Social Networks (OSNs). It utilizes a machine learning model along with APIs to detect fake profiles on platforms like Instagram and X.
+Welcome to NER Profile! This Flutter application is designed to detect impersonation profiles across various Online Social Networks (OSNs). It utilizes a machine learning model along with APIs to detect fake profiles on platforms like Instagram and X.
 
 ## Project Structure
 
