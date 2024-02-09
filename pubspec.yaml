@@ -53,6 +53,9 @@ dependencies:
   device_info_plus: ^9.1.1
   webview_flutter: ^2.0.10
   html: ^0.15.4
+  screenshot: ^2.1.0
+  pdf: ^3.10.7
+  image_gallery_saver: ^2.0.3
 
 dev_dependencies:
   flutter_test:

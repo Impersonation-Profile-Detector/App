@@ -1,10 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:impersonation_detector/Widgets/display_x.dart';
 import 'package:impersonation_detector/Widgets/loading.dart';
 import 'package:impersonation_detector/var.dart';
+import 'package:screenshot/screenshot.dart';
 import 'package:uuid/uuid.dart';
 
 class XResultsPage extends StatefulWidget {
@@ -22,6 +25,8 @@ class XResultsPageState extends State<XResultsPage> {
   List<dynamic> jsonData = [];
   List<String> idList = [];
   bool delay = true;
+  Uint8List? _imageFile;
+  ScreenshotController screenshotController = ScreenshotController();
 
   @override
   void initState() {
@@ -74,6 +79,39 @@ class XResultsPageState extends State<XResultsPage> {
           content: Text(
             e.toString(),
           ),
+        ),
+      );
+    }
+  }
+
+  Future<void> saveImageToGallery(Uint8List imageBytes) async {
+    try {
+      // Save image to gallery
+      final result = await ImageGallerySaver.saveImage(imageBytes);
+
+      if (result['isSuccess']) {
+        // Image saved successfully
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Image saved to gallery'),
+          ),
+        );
+      } else {
+        // Failed to save image
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to save image: ${result['errorMessage']}'),
+          ),
+        );
+      }
+    } catch (e) {
+      // Error occurred while saving image
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error saving image: $e'),
         ),
       );
     }
@@ -158,6 +196,82 @@ class XResultsPageState extends State<XResultsPage> {
       },
       child: Scaffold(
         appBar: AppBar(
+          actions: [
+            IconButton(
+              onPressed: () async {
+                await screenshotController.capture().then((Uint8List? image) {
+                  setState(() {
+                    _imageFile = image;
+                  });
+                }).catchError((onError) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(onError.toString()),
+                    ),
+                  );
+                });
+                if (!mounted) return;
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      title: const Text(
+                        "Screenshot Saved",
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      backgroundColor: Colors.white,
+                      content: SingleChildScrollView(
+                        physics: const BouncingScrollPhysics(),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Text(
+                              "Screenshot saved !",
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 14,
+                              ),
+                            ),
+                            const SizedBox(
+                              height: 16,
+                            ),
+                            if (_imageFile != null)
+                              ClipRRect(
+                                  borderRadius: BorderRadius.circular(12),
+                                  child: Image.memory(_imageFile!))
+                            else
+                              const Text("Image not available"),
+                          ],
+                        ),
+                      ),
+                      actions: [
+                        TextButton(
+                          onPressed: () async {
+                            await saveImageToGallery(_imageFile!);
+                            if (!mounted) return;
+                            Navigator.of(context).pop();
+                          },
+                          child: const Text(
+                            "OK",
+                            style: TextStyle(
+                              color: Colors.black,
+                            ),
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                );
+              },
+              icon: const Icon(
+                Icons.file_download_outlined,
+              ),
+            )
+          ],
           iconTheme: const IconThemeData(color: Colors.white),
           backgroundColor: const Color(0xff001220),
           title: const Text(
@@ -167,53 +281,53 @@ class XResultsPageState extends State<XResultsPage> {
           centerTitle: true,
         ),
         body: Container(
-            height: MediaQuery.of(context).size.height,
-            decoration: const BoxDecoration(
-              image: DecorationImage(
-                  image: AssetImage('assets/waves1.png'), fit: BoxFit.cover),
-            ),
-            child: delay
-                ? const Center(
-                    child: Loading(),
-                  )
-                : StreamBuilder(
-                    stream: FirebaseFirestore.instance
-                        .collection(widget.username)
-                        .snapshots(),
-                    builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const CircularProgressIndicator();
-                      } else if (!snapshot.hasData) {
-                        return const Center(child: Loading());
-                      } else if (snapshot.hasError) {
-                        return Text('Error: ${snapshot.error}');
+          height: MediaQuery.of(context).size.height,
+          decoration: const BoxDecoration(
+            image: DecorationImage(
+                image: AssetImage('assets/waves1.png'), fit: BoxFit.cover),
+          ),
+          child: delay
+              ? const Center(
+                  child: Loading(),
+                )
+              : StreamBuilder(
+                  stream: FirebaseFirestore.instance
+                      .collection(widget.username)
+                      .snapshots(),
+                  builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const CircularProgressIndicator();
+                    } else if (!snapshot.hasData) {
+                      return const Center(child: Loading());
+                    } else if (snapshot.hasError) {
+                      return Text('Error: ${snapshot.error}');
+                    } else {
+                      List<DocumentSnapshot> documents = snapshot.data!.docs;
+                      if (documents.isEmpty) {
+                        return const Center(
+                          child: Text(
+                            "No matches found ",
+                            style: TextStyle(color: Colors.white, fontSize: 20),
+                          ),
+                        );
                       } else {
-                        List<DocumentSnapshot> documents = snapshot.data!.docs;
-                        if (documents.isEmpty) {
-                          return const Center(
-                            child: Text(
-                              "No matches found ",
-                              style:
-                                  TextStyle(color: Colors.white, fontSize: 20),
-                            ),
-                          );
-                        } else {
-                          return ListView.builder(
-                            itemCount: documents.length,
-                            itemBuilder: (context, index) {
-                              var data = documents[index].data()
-                                  as Map<String, dynamic>;
-                              idList.add(documents[index].id);
-                              return DisplayContainerX(
-                                  status: data['Status'],
-                                  user: data['UserData'],
-                                  id: documents[index].id);
-                            },
-                          );
-                        }
+                        return ListView.builder(
+                          itemCount: documents.length,
+                          itemBuilder: (context, index) {
+                            var data =
+                                documents[index].data() as Map<String, dynamic>;
+                            idList.add(documents[index].id);
+                            return DisplayContainerX(
+                                status: data['Status'],
+                                user: data['UserData'],
+                                id: documents[index].id);
+                          },
+                        );
                       }
-                    },
-                  )),
+                    }
+                  },
+                ),
+        ),
       ),
     );
   }

@@ -192,14 +192,16 @@ class _HomePageState extends State<HomePage> {
                               title: const Text(
                                 'Upload Image',
                                 style: TextStyle(
-                                  fontSize: 16,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w500,
                                 ),
                               ),
                               content: const SingleChildScrollView(
                                 child: ListBody(
                                   children: <Widget>[
                                     Text(
-                                        'From where would you like to upload image ?'),
+                                      'From where would you like to upload image ?',
+                                    ),
                                   ],
                                 ),
                               ),
@@ -504,35 +506,5 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       _selectedImage = File(returnedImage.path);
     });
-  }
-
-  bool isValidate(TextEditingController controller, File selectedImage,
-      bool isInsta, bool isX) {
-    print("helloowo---------");
-    if (controller.value.text == '') {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please enter username.'),
-        ),
-      );
-      return true;
-    } else if (isInsta == false && isX == false) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please select SNS.'),
-        ),
-      );
-      return true;
-    }
-    // } else if ( selectedImage.exists()) {
-    //   ScaffoldMessenger.of(context).showSnackBar(
-    //     const SnackBar(
-    //       content: Text('Please upload an image.'),
-    //     ),
-    //   );
-    //   return true;
-    // }
-
-    return false;
   }
 }
