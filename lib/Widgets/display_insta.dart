@@ -1,6 +1,4 @@
 import 'package:avatar_glow/avatar_glow.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -63,7 +61,7 @@ class _DisplayContainerInstaState extends State<DisplayContainerInsta> {
               width: 20,
             ),
             SizedBox(
-              width: 160,
+              width: 150,
               child: SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 physics: const BouncingScrollPhysics(),

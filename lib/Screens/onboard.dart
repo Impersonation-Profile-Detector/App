@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:impersonation_detector/Screens/homepage.dart';
+import 'package:impersonation_detector/Widgets/disclaimer.dart';
 
 class OnboardSreen extends StatelessWidget {
   const OnboardSreen({super.key});
@@ -69,14 +70,13 @@ class OnboardSreen extends StatelessWidget {
                   child: Hero(
                     tag: 'home-button',
                     child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          PageRouteBuilder(
-                            transitionDuration:
-                                const Duration(milliseconds: 400),
-                            pageBuilder: (_, __, ___) => const HomePage(),
-                          ),
+                      onPressed: () async {
+                        await showModalBottomSheet(
+                          isScrollControlled: true,
+                          context: context,
+                          builder: (BuildContext context) {
+                            return const Disclaimer();
+                          },
                         );
                       },
                       child: const Text(

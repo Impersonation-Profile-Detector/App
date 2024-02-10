@@ -280,53 +280,57 @@ class XResultsPageState extends State<XResultsPage> {
           ),
           centerTitle: true,
         ),
-        body: Container(
-          height: MediaQuery.of(context).size.height,
-          decoration: const BoxDecoration(
-            image: DecorationImage(
-                image: AssetImage('assets/waves1.png'), fit: BoxFit.cover),
-          ),
-          child: delay
-              ? const Center(
-                  child: Loading(),
-                )
-              : StreamBuilder(
-                  stream: FirebaseFirestore.instance
-                      .collection(widget.username)
-                      .snapshots(),
-                  builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const CircularProgressIndicator();
-                    } else if (!snapshot.hasData) {
-                      return const Center(child: Loading());
-                    } else if (snapshot.hasError) {
-                      return Text('Error: ${snapshot.error}');
-                    } else {
-                      List<DocumentSnapshot> documents = snapshot.data!.docs;
-                      if (documents.isEmpty) {
-                        return const Center(
-                          child: Text(
-                            "No matches found ",
-                            style: TextStyle(color: Colors.white, fontSize: 20),
-                          ),
-                        );
+        body: Screenshot(
+          controller: screenshotController,
+          child: Container(
+            height: MediaQuery.of(context).size.height,
+            decoration: const BoxDecoration(
+              image: DecorationImage(
+                  image: AssetImage('assets/waves1.png'), fit: BoxFit.cover),
+            ),
+            child: delay
+                ? const Center(
+                    child: Loading(),
+                  )
+                : StreamBuilder(
+                    stream: FirebaseFirestore.instance
+                        .collection(widget.username)
+                        .snapshots(),
+                    builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const CircularProgressIndicator();
+                      } else if (!snapshot.hasData) {
+                        return const Center(child: Loading());
+                      } else if (snapshot.hasError) {
+                        return Text('Error: ${snapshot.error}');
                       } else {
-                        return ListView.builder(
-                          itemCount: documents.length,
-                          itemBuilder: (context, index) {
-                            var data =
-                                documents[index].data() as Map<String, dynamic>;
-                            idList.add(documents[index].id);
-                            return DisplayContainerX(
-                                status: data['Status'],
-                                user: data['UserData'],
-                                id: documents[index].id);
-                          },
-                        );
+                        List<DocumentSnapshot> documents = snapshot.data!.docs;
+                        if (documents.isEmpty) {
+                          return const Center(
+                            child: Text(
+                              "No matches found ",
+                              style:
+                                  TextStyle(color: Colors.white, fontSize: 20),
+                            ),
+                          );
+                        } else {
+                          return ListView.builder(
+                            itemCount: documents.length,
+                            itemBuilder: (context, index) {
+                              var data = documents[index].data()
+                                  as Map<String, dynamic>;
+                              idList.add(documents[index].id);
+                              return DisplayContainerX(
+                                  status: data['Status'],
+                                  user: data['UserData'],
+                                  id: documents[index].id);
+                            },
+                          );
+                        }
                       }
-                    }
-                  },
-                ),
+                    },
+                  ),
+          ),
         ),
       ),
     );
