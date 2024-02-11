@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -7,6 +9,7 @@ import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:impersonation_detector/Widgets/display_x.dart';
 import 'package:impersonation_detector/Widgets/loading.dart';
 import 'package:impersonation_detector/var.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:screenshot/screenshot.dart';
 import 'package:uuid/uuid.dart';
 
@@ -117,6 +120,43 @@ class XResultsPageState extends State<XResultsPage> {
     }
   }
 
+  Future<void> exportFirestoreDataToCsv() async {
+    try {
+      QuerySnapshot querySnapshot =
+          await FirebaseFirestore.instance.collection(widget.username).get();
+      String csvData = '';
+      csvData += 'Name,ProfileImage,ProfileUrl,Accuracy\n';
+      for (var doc in querySnapshot.docs) {
+        String profileLink =
+            "https://twitter.com/${doc['UserData']['screen_name']}";
+        csvData +=
+            '${doc['Name']},${doc['Req_Image']},$profileLink,${((1 - doc['Status']) * 100).ceil()}%\n';
+      }
+
+      Directory? directory = Directory("/storage/emulated/0/Download");
+
+      String filePath = '${directory.path}/nerprofile_${widget.username}_x.csv';
+
+      File file = File(filePath);
+      await file.writeAsString(csvData);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).clearSnackBars();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('CSV File saved at: $filePath'),
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).clearSnackBars();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('CSV Error saving file: $e'),
+        ),
+      );
+    }
+  }
+
   Future<void> fetchData() async {
     // API endpoint and headers
     const url = 'https://twitter-api45.p.rapidapi.com/search.php';
@@ -199,73 +239,7 @@ class XResultsPageState extends State<XResultsPage> {
           actions: [
             IconButton(
               onPressed: () async {
-                await screenshotController.capture().then((Uint8List? image) {
-                  setState(() {
-                    _imageFile = image;
-                  });
-                }).catchError((onError) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(onError.toString()),
-                    ),
-                  );
-                });
-                if (!mounted) return;
-                showDialog(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return AlertDialog(
-                      title: const Text(
-                        "Screenshot Saved",
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      backgroundColor: Colors.white,
-                      content: SingleChildScrollView(
-                        physics: const BouncingScrollPhysics(),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Text(
-                              "Screenshot saved !",
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 14,
-                              ),
-                            ),
-                            const SizedBox(
-                              height: 16,
-                            ),
-                            if (_imageFile != null)
-                              ClipRRect(
-                                  borderRadius: BorderRadius.circular(12),
-                                  child: Image.memory(_imageFile!))
-                            else
-                              const Text("Image not available"),
-                          ],
-                        ),
-                      ),
-                      actions: [
-                        TextButton(
-                          onPressed: () async {
-                            await saveImageToGallery(_imageFile!);
-                            if (!mounted) return;
-                            Navigator.of(context).pop();
-                          },
-                          child: const Text(
-                            "OK",
-                            style: TextStyle(
-                              color: Colors.black,
-                            ),
-                          ),
-                        ),
-                      ],
-                    );
-                  },
-                );
+                await exportFirestoreDataToCsv();
               },
               icon: const Icon(
                 Icons.file_download_outlined,

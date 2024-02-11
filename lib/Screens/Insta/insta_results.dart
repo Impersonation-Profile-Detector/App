@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -7,6 +8,7 @@ import 'package:http/http.dart' as http;
 import 'package:impersonation_detector/Widgets/display_insta.dart';
 import 'package:impersonation_detector/Widgets/loading.dart';
 import 'package:impersonation_detector/var.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:screenshot/screenshot.dart';
 import 'package:uuid/uuid.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
@@ -112,6 +114,42 @@ class InstaResultsPageState extends State<InstaResultsPage> {
     }
   }
 
+  Future<void> exportFirestoreDataToCsv() async {
+    try {
+      QuerySnapshot querySnapshot =
+          await FirebaseFirestore.instance.collection(widget.username).get();
+      String csvData = '';
+      csvData += 'Name,ProfileImage,ProfileUrl,Accuracy\n';
+      for (var doc in querySnapshot.docs) {
+        String profileLink =
+            "https://www.instagram.com/${doc['UserData']['username']}";
+        csvData +=
+            '${doc['Name']},${doc['Req_Image']},$profileLink,${((1 - doc['Status']) * 100).ceil()}%\n';
+      }
+      Directory? directory = Directory("/storage/emulated/0/Download");
+
+      String filePath = '${directory.path}/nerprofile_${widget.username}_insta.csv';
+
+      File file = File(filePath);
+      await file.writeAsString(csvData);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).clearSnackBars();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('CSV File saved at: $filePath'),
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).clearSnackBars();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('CSV Error saving file: $e'),
+        ),
+      );
+    }
+  }
+
   Future<void> delayFunction(Duration duration) async {
     await Future.delayed(duration);
     setState(() {
@@ -125,7 +163,7 @@ class InstaResultsPageState extends State<InstaResultsPage> {
         'https://rocketapi-for-instagram.p.rapidapi.com/instagram/search';
     final headers = {
       'content-type': 'application/json',
-      'X-RapidAPI-Key': 'e33db81bf2msh8b2a2c7b8cf5363p1c7fbbjsn2617a896ce97',
+      'X-RapidAPI-Key': '8db0e54e94msh98b37a582a2adefp182a93jsnf53067009cea',
       'X-RapidAPI-Host': 'rocketapi-for-instagram.p.rapidapi.com',
     };
 
@@ -215,73 +253,7 @@ class InstaResultsPageState extends State<InstaResultsPage> {
           actions: [
             IconButton(
               onPressed: () async {
-                await screenshotController.capture().then((Uint8List? image) {
-                  setState(() {
-                    _imageFile = image;
-                  });
-                }).catchError((onError) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(onError.toString()),
-                    ),
-                  );
-                });
-                if (!mounted) return;
-                showDialog(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return AlertDialog(
-                      title: const Text(
-                        "Screenshot Saved",
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      backgroundColor: Colors.white,
-                      content: SingleChildScrollView(
-                        physics: const BouncingScrollPhysics(),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Text(
-                              "Screenshot saved !",
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 14,
-                              ),
-                            ),
-                            const SizedBox(
-                              height: 16,
-                            ),
-                            if (_imageFile != null)
-                              ClipRRect(
-                                  borderRadius: BorderRadius.circular(12),
-                                  child: Image.memory(_imageFile!))
-                            else
-                              const Text("Image not available"),
-                          ],
-                        ),
-                      ),
-                      actions: [
-                        TextButton(
-                          onPressed: () async {
-                            await saveImageToGallery(_imageFile!);
-                            if (!mounted) return;
-                            Navigator.of(context).pop();
-                          },
-                          child: const Text(
-                            "OK",
-                            style: TextStyle(
-                              color: Colors.black,
-                            ),
-                          ),
-                        ),
-                      ],
-                    );
-                  },
-                );
+                await exportFirestoreDataToCsv();
               },
               icon: const Icon(
                 Icons.file_download_outlined,

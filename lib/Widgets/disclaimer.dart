@@ -17,6 +17,7 @@ class Disclaimer extends StatelessWidget {
               width: MediaQuery.of(context).size.width * 0.70,
               child: const Divider(
                 color: Colors.white,
+                height: 2,
                 thickness: 0.5,
               )),
           const SizedBox(
@@ -31,10 +32,10 @@ class Disclaimer extends StatelessWidget {
             ),
           ),
           const SizedBox(
-            height: 18,
+            height: 12,
           ),
           const Text(
-            'NER Profile is a tool designed to aid in identifying potential fake profiles on social media platforms. While we strive for accuracy, results may vary. Users are encouraged to use their discretion and verify findings independently. NER Profile does not guarantee the accuracy of its assessments and is not liable for any consequences resulting from reliance on its services.',
+            'NER Profile is a tool designed to aid in identifying potential fake profiles on social media platforms. While we strive for accuracy, results may vary. Users are encouraged to use their discretion and verify findings independently.',
             textAlign: TextAlign.justify,
             style: TextStyle(fontSize: 16, color: Colors.white),
           ),

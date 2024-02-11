@@ -20,7 +20,7 @@ class OnboardSreen extends StatelessWidget {
             child: Column(
               children: [
                 const SizedBox(
-                  height: 60,
+                  height: 50,
                 ),
                 const Text(
                   'NER Profile',
@@ -30,11 +30,39 @@ class OnboardSreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(
-                  height: 55,
+                  height: 30,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    SizedBox(
+                      height: 125,
+                      width: 125,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(20),
+                        child: Image.asset(
+                          'assets/nitcw.png',
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      height: 125,
+                      width: 125,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(20),
+                        child: Image.asset(
+                          'assets/bprd.png',
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(
+                  height: 18,
                 ),
                 Container(
-                  height: 300,
-                  width: 300,
+                  height: 270,
+                  width: 270,
                   decoration: BoxDecoration(
                       color: Colors.white60,
                       borderRadius: BorderRadius.circular(20),
@@ -54,7 +82,7 @@ class OnboardSreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(
-                  height: 40,
+                  height: 30,
                 ),
                 const Text(
                   'A mobile app to check whether there are accounts impersonating a given social media account.',
@@ -62,11 +90,11 @@ class OnboardSreen extends StatelessWidget {
                   style: TextStyle(fontSize: 18, color: Colors.white),
                 ),
                 const SizedBox(
-                  height: 40,
+                  height: 30,
                 ),
                 SizedBox(
-                  height: 50,
-                  width: 200,
+                  height: 60,
+                  width: 220,
                   child: Hero(
                     tag: 'home-button',
                     child: ElevatedButton(
@@ -81,7 +109,7 @@ class OnboardSreen extends StatelessWidget {
                       },
                       child: const Text(
                         'Detect',
-                        style: TextStyle(fontSize: 16),
+                        style: TextStyle(fontSize: 18),
                       ),
                     ),
                   ),

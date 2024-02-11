@@ -99,7 +99,7 @@ class _DisplayContainerInstaState extends State<DisplayContainerInsta> {
               padding: const EdgeInsets.symmetric(horizontal: 12),
               child: Text(
                 "${((1 - widget.status) * 100).ceil()}%",
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 16,
                   color: Colors.red,
                   fontWeight: FontWeight.bold,
