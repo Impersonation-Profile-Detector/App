@@ -81,7 +81,7 @@ class _DisplayContainerXState extends State<DisplayContainerX> {
                       onTap: () {
                         String screenName = widget.user['screen_name'] ?? '';
                         launchUrl(
-                          Uri.parse(" "),
+                          Uri.parse("https://twitter.com/$screenName"),
                         );
                       },
                       child: const Text(
