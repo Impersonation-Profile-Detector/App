@@ -59,55 +59,53 @@ class _DisplayContainerXState extends State<DisplayContainerX> {
               ),
             ),
             const SizedBox(
-              width: 20,
+              width: 30,
             ),
-            SizedBox(
-              width: 150,
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                physics: const BouncingScrollPhysics(),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      widget.user['name'] ?? 'N/A',
-                      style: const TextStyle(
-                        fontSize: 16,
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              physics: const BouncingScrollPhysics(),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    widget.user['name'] ?? 'N/A',
+                    style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      String screenName = widget.user['screen_name'] ?? '';
+                      launchUrl(
+                        Uri.parse("https://twitter.com/$screenName"),
+                      );
+                    },
+                    child: const Text(
+                      'Profile Link',
+                      style: TextStyle(
+                        color: Colors.black,
                         fontWeight: FontWeight.w400,
+                        decoration: TextDecoration.underline,
                       ),
                     ),
-                    GestureDetector(
-                      onTap: () {
-                        String screenName = widget.user['screen_name'] ?? '';
-                        launchUrl(
-                          Uri.parse("https://twitter.com/$screenName"),
-                        );
-                      },
-                      child: const Text(
-                        'Profile Link',
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontWeight: FontWeight.bold,
-                          decoration: TextDecoration.underline,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              child: Text(
-                "${((1 - widget.status) * 100).ceil()}%",
-                style: const TextStyle(
-                  fontSize: 16,
-                  color: Colors.red,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            )
+
+            // Padding(
+            //   padding: const EdgeInsets.symmetric(horizontal: 12),
+            //   child: Text(
+            //     "${((1 - widget.status) * 100).ceil()}%",
+            //     style: const TextStyle(
+            //       fontSize: 16,
+            //       color: Colors.red,
+            //       fontWeight: FontWeight.bold,
+            //     ),
+            //   ),
+            // )
           ],
         ),
       ),

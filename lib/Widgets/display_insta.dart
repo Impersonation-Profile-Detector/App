@@ -58,54 +58,51 @@ class _DisplayContainerInstaState extends State<DisplayContainerInsta> {
               ),
             ),
             const SizedBox(
-              width: 20,
+              width: 30,
             ),
-            SizedBox(
-              width: 150,
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                physics: const BouncingScrollPhysics(),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      widget.user['full_name'] ?? 'N/A',
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              physics: const BouncingScrollPhysics(),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    widget.user['full_name'] ?? 'N/A',
+                    style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      String userN = widget.user['username'];
+                      launchUrl(Uri.parse("https://www.instagram.com/$userN"));
+                    },
+                    child: const Text(
+                      'Profile Link',
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontWeight: FontWeight.w400,
+                        decoration: TextDecoration.underline,
                       ),
                     ),
-                    GestureDetector(
-                      onTap: () {
-                        String userN = widget.user['username'];
-                        launchUrl(
-                            Uri.parse("https://www.instagram.com/$userN"));
-                      },
-                      child: const Text(
-                        'Profile Link',
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontWeight: FontWeight.bold,
-                          decoration: TextDecoration.underline,
-                        ),
-                      ),
-                    )
-                  ],
-                ),
+                  )
+                ],
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              child: Text(
-                "${((1 - widget.status) * 100).ceil()}%",
-                style: const TextStyle(
-                  fontSize: 16,
-                  color: Colors.red,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            )
+
+            // Padding(
+            //   padding: const EdgeInsets.symmetric(horizontal: 12),
+            //   child: Text(
+            //     "${((1 - widget.status) * 100).ceil()}%",
+            //     style: const TextStyle(
+            //       fontSize: 16,
+            //       color: Colors.red,
+            //       fontWeight: FontWeight.bold,
+            //     ),
+            //   ),
+            // )
           ],
         ),
       ),

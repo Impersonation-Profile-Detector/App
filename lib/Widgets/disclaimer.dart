@@ -35,7 +35,7 @@ class Disclaimer extends StatelessWidget {
             height: 12,
           ),
           const Text(
-            'NER Profile is a tool designed to aid in identifying potential fake profiles on social media platforms. While we strive for accuracy, results may vary. Users are encouraged to use their discretion and verify findings independently.',
+            'NER Profile is a tool designed to aid in identifying potential fake profiles on social media platforms. While we strive for accuracy, results may vary. Users are encouraged to use their discretion and verify findings independently. The end user should independently verify the results before making any decisions or taking actions based on the results provided.',
             textAlign: TextAlign.justify,
             style: TextStyle(fontSize: 16, color: Colors.white),
           ),
